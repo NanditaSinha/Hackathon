@@ -1,5 +1,6 @@
 package com.onlinebanking.hackathon.Entity;
 
+import com.onlinebanking.hackathon.enums.AccountActivityType;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -13,13 +14,24 @@ public class CustomerTransaction {
     private Long transactionId;
 
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
-    private Account account;
+    @JoinColumn(name = "account_id_from", nullable = false)
+    private Account accountto;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id_to", nullable = false)
+    private Account accountfrom;
 
     private String transactionType;
     private BigDecimal amount;
+
+    private Timestamp dateofTransfer;
     private Timestamp transactionDate;
-    private String description;
+    private String comment;
+
+    private AccountActivityType accountActivityType;
+
+
+
 
     // getters and setters
 
