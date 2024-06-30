@@ -1,4 +1,4 @@
-package com.onlinebanking.hackathon.Controller;
+package com.onlinebanking.hackathon.controller;
 
 import com.onlinebanking.hackathon.Entity.CustomerUser;
 import com.onlinebanking.hackathon.Exception.UserNotFoundException;

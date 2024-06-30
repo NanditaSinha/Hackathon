@@ -1,13 +1,11 @@
-package com.onlinebanking.hackathon.Controller;
+package com.onlinebanking.hackathon.controller;
 
 import com.onlinebanking.hackathon.Entity.Customer;
-import com.onlinebanking.hackathon.Entity.CustomerUser;
 import com.onlinebanking.hackathon.Exception.UserNotFoundException;
 import com.onlinebanking.hackathon.Service.CustomerService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/auth")

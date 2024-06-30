@@ -1,14 +1,10 @@
-package com.onlinebanking.hackathon.Controller;
+package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.Entity.Account;
 import com.onlinebanking.hackathon.Entity.Transaction;
 import com.onlinebanking.hackathon.Service.AccountService;
 import com.onlinebanking.hackathon.Service.TransactionService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

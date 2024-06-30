@@ -1,9 +1,7 @@
-package com.onlinebanking.hackathon.Controller;
+package com.onlinebanking.hackathon.controller;
 
 import com.onlinebanking.hackathon.Entity.Account;
 import com.onlinebanking.hackathon.Entity.Customer;
-import com.onlinebanking.hackathon.Entity.CustomerUser;
-import com.onlinebanking.hackathon.Entity.Transaction;
 import com.onlinebanking.hackathon.Exception.UserNotFoundException;
 import com.onlinebanking.hackathon.Service.AccountService;
 import com.onlinebanking.hackathon.Service.CustomerService;
@@ -11,7 +9,6 @@ import com.onlinebanking.hackathon.Service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -19,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/accounts")
