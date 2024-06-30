@@ -1,8 +1,7 @@
-package com.onlinebanking.hackathon.Service;
+package com.onlinebanking.hackathon.service;
 
-import com.onlinebanking.hackathon.Entity.Customer;
-import com.onlinebanking.hackathon.Entity.CustomerUser;
-import com.onlinebanking.hackathon.Repository.CustomerRepository;
+import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

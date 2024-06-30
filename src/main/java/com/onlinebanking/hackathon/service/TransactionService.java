@@ -1,19 +1,15 @@
-package com.onlinebanking.hackathon.Service;
+package com.onlinebanking.hackathon.service;
 
-import com.onlinebanking.hackathon.Entity.Account;
-import com.onlinebanking.hackathon.Entity.CustomerUser;
-import com.onlinebanking.hackathon.Entity.Transaction;
-import com.onlinebanking.hackathon.Repository.AccountRepository;
-import com.onlinebanking.hackathon.Repository.TransactionRepository;
+import com.onlinebanking.hackathon.entity.Account;
+import com.onlinebanking.hackathon.entity.Transaction;
+import com.onlinebanking.hackathon.repository.AccountRepository;
+import com.onlinebanking.hackathon.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -53,5 +49,12 @@ public class TransactionService {
     public Transaction findById(Long id) {
         return transactionRepository.findById(id).orElse(null);
     }
+
+/*    public Account getAccountDetails(Long accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+    }*/
+
+
 }
 

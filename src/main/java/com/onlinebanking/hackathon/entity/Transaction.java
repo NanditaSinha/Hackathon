@@ -1,4 +1,4 @@
-package com.onlinebanking.hackathon.Entity;
+package com.onlinebanking.hackathon.entity;
 
 import jakarta.persistence.Entity;
 

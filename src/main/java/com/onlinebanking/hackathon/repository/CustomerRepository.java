@@ -1,6 +1,6 @@
-package com.onlinebanking.hackathon.Repository;
+package com.onlinebanking.hackathon.repository;
 
-import com.onlinebanking.hackathon.Entity.Customer;
+import com.onlinebanking.hackathon.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
