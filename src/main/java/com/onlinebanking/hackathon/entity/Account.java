@@ -1,8 +1,8 @@
 package com.onlinebanking.hackathon.entity;
 
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 @Entity
