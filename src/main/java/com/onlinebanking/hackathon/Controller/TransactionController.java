@@ -34,6 +34,11 @@ public class TransactionController {
     public List<Transaction> getLast10Transactions(@PathVariable String accountNumber) {
         return transactionService.findLast10TransactionsByAccountNumber(accountNumber);
     }
+
+    @GetMapping("/transactionDetails/{id}")
+    public Transaction transactionDetails(@PathVariable Long id) {
+        return transactionService.findById(id);
+    }
 }
 
 @Data
