@@ -1,4 +1,4 @@
-package com.onlinebanking.hackathon.Config;
+package com.onlinebanking.hackathon.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

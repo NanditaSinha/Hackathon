@@ -1,8 +1,8 @@
 package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.Entity.Customer;
-import com.onlinebanking.hackathon.Exception.UserNotFoundException;
-import com.onlinebanking.hackathon.Service.CustomerService;
+import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.exception.UserNotFoundException;
+import com.onlinebanking.hackathon.service.CustomerService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;

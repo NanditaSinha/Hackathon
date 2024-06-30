@@ -1,12 +1,12 @@
-package com.onlinebanking.hackathon.Service;
+package com.onlinebanking.hackathon.service;
 
-import com.onlinebanking.hackathon.Exception.UserNotFoundException;
+import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import com.onlinebanking.hackathon.Entity.CustomerUser;
-import com.onlinebanking.hackathon.Repository.CustomerUserRepository;
+import com.onlinebanking.hackathon.entity.CustomerUser;
+import com.onlinebanking.hackathon.repository.CustomerUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;

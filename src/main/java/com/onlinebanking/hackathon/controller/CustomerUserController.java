@@ -1,8 +1,8 @@
 package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.Entity.CustomerUser;
-import com.onlinebanking.hackathon.Exception.UserNotFoundException;
-import com.onlinebanking.hackathon.Service.CustomerUserService;
+import com.onlinebanking.hackathon.entity.CustomerUser;
+import com.onlinebanking.hackathon.exception.UserNotFoundException;
+import com.onlinebanking.hackathon.service.CustomerUserService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;

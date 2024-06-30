@@ -1,11 +1,11 @@
 package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.Entity.Account;
-import com.onlinebanking.hackathon.Entity.Customer;
-import com.onlinebanking.hackathon.Exception.UserNotFoundException;
-import com.onlinebanking.hackathon.Service.AccountService;
-import com.onlinebanking.hackathon.Service.CustomerService;
-import com.onlinebanking.hackathon.Service.TransactionService;
+import com.onlinebanking.hackathon.entity.Account;
+import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.exception.UserNotFoundException;
+import com.onlinebanking.hackathon.service.AccountService;
+import com.onlinebanking.hackathon.service.CustomerService;
+import com.onlinebanking.hackathon.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -95,5 +95,20 @@ public class AccountController {
            throw new UserNotFoundException("No Transaction found for the account");
        }
         return transactionService.findRecentTransactions((Account) account, limit);
+    }*/
+
+    @GetMapping("/{accountNumber}")
+    public EntityModel<Account> getAccountByAccountNumber(@PathVariable String accountNumber) {
+        Account account = accountService.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        return EntityModel.of(account);
+    }
+
+/*    @GetMapping("/{accountId}")
+    public ResponseEntity<Account> getAccountDetails(@PathVariable Long accountId) {
+        Account account = accountService.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        return ResponseEntity.ok(account);
     }*/
 }

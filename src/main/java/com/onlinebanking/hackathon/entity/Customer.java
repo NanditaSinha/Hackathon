@@ -1,4 +1,4 @@
-package com.onlinebanking.hackathon.Entity;
+package com.onlinebanking.hackathon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.onlinebanking.hackathon.Exception;
+package com.onlinebanking.hackathon.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
