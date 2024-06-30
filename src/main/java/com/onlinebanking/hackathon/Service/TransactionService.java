@@ -23,7 +23,7 @@ public class TransactionService {
     private AccountRepository accountRepository;
 
     @Transactional
-    public void transferFunds(Long fromAccountId, Long toAccountId, BigDecimal amount) {
+    public void transferFunds(Long fromAccountId, Long toAccountId, BigDecimal amount, String comment) {
         Account fromAccount = accountRepository.findById(fromAccountId).orElseThrow(() -> new RuntimeException("Account not found"));
         Account toAccount = accountRepository.findById(toAccountId).orElseThrow(() -> new RuntimeException("Account not found"));
 
@@ -41,16 +41,12 @@ public class TransactionService {
         transaction.setFromAccount(fromAccount);
         transaction.setToAccount(toAccount);
         transaction.setAmount(amount);
+        transaction.setComment(comment);
         transactionRepository.save(transaction);
     }
 
-    public List<Transaction> findRecentTransactions(Account account, int limit) {
-        Pageable pageable = PageRequest.of(0, limit);
-        return transactionRepository.findByFromAccountOrToAccountOrderByTransactionDateDesc(account, account, pageable);
-    }
-
-    public Optional<Transaction> findById(Long id) {
-        return transactionRepository.findById(id);
+    public List<Transaction> findLast10TransactionsByAccountNumber(String accountNumber) {
+        return transactionRepository.findFirst10ByFromAccount_AccountNumberOrderByTransactionDateDesc(accountNumber);
     }
 }
 
