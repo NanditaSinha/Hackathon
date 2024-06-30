@@ -27,6 +27,8 @@ public class Transaction {
     @Temporal(TemporalType.TIMESTAMP)
     private Date transactionDate;
 
+    private String comment;
+
     // getters and setters
 
     public Long getId() {
@@ -67,5 +69,13 @@ public class Transaction {
 
     public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

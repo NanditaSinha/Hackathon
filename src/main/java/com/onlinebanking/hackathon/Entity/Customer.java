@@ -1,5 +1,6 @@
 package com.onlinebanking.hackathon.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,7 +15,7 @@ public class Customer {
     private String firstname;
 
     private String lastname;
-
+    @JsonIgnore
     private String password;
 
     // getters and setters
