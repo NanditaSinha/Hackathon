@@ -2,26 +2,27 @@ package com.onlinebanking.hackathon.Entity;
 
 import jakarta.persistence.*;
 
-import java.security.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Entity
-public class Customer {
+public class CustomerUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstname;
-    private String lastname;
-    private String email;
-    private String phone;
 
-    public Long getId() {
+    private String firstname;
+    @Column(nullable = false)
+    private String lastname;
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private long phone;
+
+    public Long getCustomer_id() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCustomer_id(Long customer_id) {
+        this.id = customer_id;
     }
 
     public String getFirstname() {
@@ -48,11 +49,10 @@ public class Customer {
         this.email = email;
     }
 
-    public String getPhone() {
+    public long getPhone() {
         return phone;
     }
-
-    public void setPhone(String phone) {
+    public void setPhone(long phone) {
         this.phone = phone;
     }
 }
