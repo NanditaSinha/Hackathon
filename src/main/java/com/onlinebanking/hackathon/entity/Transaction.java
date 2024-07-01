@@ -3,6 +3,7 @@ package com.onlinebanking.hackathon.entity;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
 import java.util.Date;
