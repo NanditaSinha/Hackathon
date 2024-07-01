@@ -18,7 +18,7 @@ public class Customer {
     private String firstname;
 
     private String lastname;
-    @JsonIgnore
+
     @Size(min = 5, message = "Password should have at least 5 characters")
     private String password;
 
@@ -29,6 +29,19 @@ public class Customer {
 
     @Column(nullable = false)
     private long phone;
+
+    public Customer() {
+    }
+
+    public Customer(Long id, String username, String firstname, String lastname, String password, String email, long phone) {
+        this.id = id;
+        this.username = username;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.password = password;
+        this.email = email;
+        this.phone = phone;
+    }
 
     // getters and setters
 
@@ -70,5 +83,21 @@ public class Customer {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public long getPhone() {
+        return phone;
+    }
+
+    public void setPhone(long phone) {
+        this.phone = phone;
     }
 }

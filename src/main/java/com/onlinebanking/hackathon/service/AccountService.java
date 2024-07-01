@@ -3,6 +3,7 @@ package com.onlinebanking.hackathon.service;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.repository.AccountRepository;
+import com.onlinebanking.hackathon.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,9 @@ import java.util.Optional;
 public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Autowired
     private CustomerService customerService;
@@ -42,6 +46,26 @@ public class AccountService {
     public Account getAccountDetails(Long accountId) {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
+    }
+
+    public Account createAccount(Account account, Long customerId) {
+        Customer customer = customerRepository.findById(customerId).orElse(null);
+        if (customer != null) {
+            account.setCustomer(customer);
+            return accountRepository.save(account);
+        }
+        return null;
+    }
+
+    public Account createAccountUserName(String username, Account accountDetails) {
+
+        Optional<Customer> customerOptional = customerRepository.findByUsername(username);
+        if (customerOptional.isEmpty()) {
+            throw new RuntimeException("Customer not found");
+        }
+        Customer customer = customerOptional.get();
+        accountDetails.setCustomer(customer);
+        return accountRepository.save(accountDetails);
     }
 
 
