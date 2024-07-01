@@ -2,6 +2,9 @@ package com.onlinebanking.hackathon.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Customer {
@@ -11,12 +14,21 @@ public class Customer {
 
     @Column(unique = true)
     private String username;
-
+    @NotBlank(message = "First Name is mandatory")
     private String firstname;
 
     private String lastname;
     @JsonIgnore
+    @Size(min = 5, message = "Password should have at least 5 characters")
     private String password;
+
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is mandatory")
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private long phone;
 
     // getters and setters
 

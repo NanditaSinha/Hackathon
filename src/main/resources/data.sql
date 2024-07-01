@@ -1,8 +1,8 @@
 
-INSERT INTO Customer (username, firstname, lastname, password)
-VALUES ('john_doe', 'John', 'Doe', 'password123'),
-               ('NanditaSinha', 'Nandita', 'Sinha', 'Ganesh'),
-                ('AdityaSinha', 'Aditya', 'Sinha', 'letmein');
+INSERT INTO Customer (username, firstname, lastname, password, email, phone)
+VALUES ('NeelamPrasad', 'Neelam', 'Prasad', 'password123','neelam.prasad@gmail.com',637383952),
+               ('NanditaSinha', 'Nandita', 'Sinha', 'Ganesh','nandita.sinha@gmail.com',46568942),
+                ('AdityaSinha', 'Aditya', 'Sinha', 'letmein','aditya.sinha@gmail.com',32536364);
 
 
 
