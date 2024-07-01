@@ -1,5 +1,6 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.TransactionDTO;
 import com.onlinebanking.hackathon.entity.Transaction;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.TransactionService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -69,6 +71,12 @@ public class TransactionController {
         Account account = transactionService.getAccountDetails(id);
         return ResponseEntity.ok(account);
     }*/
+
+    @GetMapping("/account/{accountNumber}/last10")
+    public ResponseEntity<List<TransactionDTO>> getLast10TransactionswithType(@PathVariable String accountNumber) {
+        List<TransactionDTO> transactions = transactionService.getLast10TransactionsWithType(accountNumber);
+        return ResponseEntity.ok(transactions);
+    }
 }
 
 @Data

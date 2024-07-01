@@ -3,6 +3,7 @@ package com.onlinebanking.hackathon.controller;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
@@ -82,6 +83,12 @@ public class AuthController {
         entityModel.add(link.withRel("all-customers"));*/
 
         return entityModel;
+    }
+
+    @PostMapping("/addCustomer")
+    public ResponseEntity<Customer> createCustomer(@Valid @RequestBody Customer customer) {
+        Customer createdCustomer = customerService.createCustomer(customer);
+        return ResponseEntity.ok(createdCustomer);
     }
 
 }

@@ -6,9 +6,11 @@ import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.CustomerService;
 import com.onlinebanking.hackathon.service.TransactionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -29,11 +31,11 @@ public class AccountController {
     @Autowired
     private TransactionService transactionService;
 
-    @GetMapping
+/*    @GetMapping
     public List<Account> getAccounts(Principal principal) {
         Customer customer = customerService.findByUsername(principal.getName()).orElseThrow(() -> new RuntimeException("Customer not found"));
         return accountService.findByCustomer(customer);
-    }
+    }*/
 
     @GetMapping("/findAccountByCustomerId/{id}")
     public CollectionModel<EntityModel<Account>> findAccountByCustomerId(@PathVariable long id) {
@@ -103,6 +105,21 @@ public class AccountController {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
         return EntityModel.of(account);
+    }
+
+    @PostMapping("/createaccountBycustomerid/{customerId}")
+    public ResponseEntity<Account> createAccount(@PathVariable Long customerId, @Valid @RequestBody Account account) {
+        Account createdAccount = accountService.createAccount(account, customerId);
+        if (createdAccount == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(createdAccount);
+    }
+
+    @PostMapping("/createaccountByusername/{username}")
+    public ResponseEntity<Account> createAccountByUserName(@PathVariable String username, @Valid @RequestBody Account account) {
+        Account createdAccount = accountService.createAccountUserName(username, account);
+        return ResponseEntity.ok(createdAccount);
     }
 
 /*    @GetMapping("/{accountId}")

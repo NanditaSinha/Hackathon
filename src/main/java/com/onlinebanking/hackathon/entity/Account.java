@@ -20,6 +20,15 @@ public class Account {
 
     private BigDecimal balance;
 
+    public Account() {
+    }
+
+    public Account(Long id, Customer customer, String accountNumber, BigDecimal balance) {
+        this.id = id;
+        this.customer = customer;
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+    }
     // getters and setters
 
     public Long getId() {

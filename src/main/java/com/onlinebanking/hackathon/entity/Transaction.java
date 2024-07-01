@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -23,12 +24,22 @@ public class Transaction {
     private Account toAccount;
 
     private BigDecimal amount;
-
-    @Column(insertable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date transactionDate;
+    private LocalDateTime transactionDate;
 
     private String comment;
+
+    public Transaction() {
+    }
+
+    public Transaction(Long id, Account fromAccount, Account toAccount, BigDecimal amount, LocalDateTime  transactionDate, String comment) {
+        this.id = id;
+        this.fromAccount = fromAccount;
+        this.toAccount = toAccount;
+        this.amount = amount;
+        this.transactionDate = transactionDate;
+        this.comment = comment;
+    }
 
     // getters and setters
 
@@ -64,11 +75,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public Date getTransactionDate() {
+    public LocalDateTime  getTransactionDate() {
         return transactionDate;
     }
 
-    public void setTransactionDate(Date transactionDate) {
+    public void setTransactionDate(LocalDateTime  transactionDate) {
         this.transactionDate = transactionDate;
     }
 

@@ -1,15 +1,20 @@
 package com.onlinebanking.hackathon.service;
 
+import com.onlinebanking.hackathon.dto.TransactionDTO;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Transaction;
 import com.onlinebanking.hackathon.repository.AccountRepository;
 import com.onlinebanking.hackathon.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
+import org.hibernate.annotations.CurrentTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -39,6 +44,7 @@ public class TransactionService {
         transaction.setToAccount(toAccount);
         transaction.setAmount(amount);
         transaction.setComment(comment);
+        transaction.setTransactionDate(LocalDateTime.now());
         transactionRepository.save(transaction);
     }
 
@@ -54,6 +60,14 @@ public class TransactionService {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }*/
+
+    public List<TransactionDTO> getLast10TransactionsWithType(String accountNumber) {
+        List<Transaction> transactions = transactionRepository.findLast10TransactionsByAccountNumber(accountNumber, PageRequest.of(0, 10));
+        return transactions.stream().map(transaction -> {
+            String typeoftransaction = transaction.getFromAccount().getAccountNumber().equals(accountNumber) ? "DEBIT" : "CREDIT";
+            return new TransactionDTO(transaction, typeoftransaction);
+        }).collect(Collectors.toList());
+    }
 
 
 }
