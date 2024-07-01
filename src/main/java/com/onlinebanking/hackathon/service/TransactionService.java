@@ -61,11 +61,22 @@ public class TransactionService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }*/
 
-    public List<TransactionDTO> getLast10TransactionsWithType(String accountNumber) {
-        List<Transaction> transactions = transactionRepository.findLast10TransactionsByAccountNumber(accountNumber, PageRequest.of(0, 10));
-        return transactions.stream().map(transaction -> {
-            String typeoftransaction = transaction.getFromAccount().getAccountNumber().equals(accountNumber) ? "DEBIT" : "CREDIT";
-            return new TransactionDTO(transaction, typeoftransaction);
+    public List<TransactionDTO> getLast10Transactions(String accountNumber) {
+        List<Transaction> transactions = transactionRepository.findLast10TransactionsByAccountNumber(accountNumber);
+        return transactions.stream().limit(10).map(transaction -> {
+            TransactionDTO dto = new TransactionDTO();
+            dto.setId(transaction.getId());
+            dto.setFromAccount(transaction.getFromAccount());
+            dto.setToAccount(transaction.getToAccount());
+            dto.setAmount(transaction.getAmount());
+            dto.setTransactionDate(transaction.getTransactionDate());
+            dto.setComment(transaction.getComment());
+            if (transaction.getFromAccount().getAccountNumber().equals(accountNumber)) {
+                dto.setTypeoftransaction("DEBIT");
+            } else if (transaction.getToAccount().getAccountNumber().equals(accountNumber)) {
+                dto.setTypeoftransaction("CREDIT");
+            }
+            return dto;
         }).collect(Collectors.toList());
     }
 
