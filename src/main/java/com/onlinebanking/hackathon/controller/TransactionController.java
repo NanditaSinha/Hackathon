@@ -72,9 +72,9 @@ public class TransactionController {
         return ResponseEntity.ok(account);
     }*/
 
-    @GetMapping("/account/{accountNumber}/last10")
-    public ResponseEntity<List<TransactionDTO>> getLast10TransactionswithType(@PathVariable String accountNumber) {
-        List<TransactionDTO> transactions = transactionService.getLast10TransactionsWithType(accountNumber);
+    @GetMapping("/{accountNumber}/last10")
+    public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(@PathVariable String accountNumber) {
+        List<TransactionDTO> transactions = transactionService.getLast10Transactions(accountNumber);
         return ResponseEntity.ok(transactions);
     }
 }

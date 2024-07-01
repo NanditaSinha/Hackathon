@@ -1,6 +1,5 @@
 package com.onlinebanking.hackathon.dto;
-
-import com.onlinebanking.hackathon.entity.Transaction;
+import com.onlinebanking.hackathon.entity.Account;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,22 +7,12 @@ import java.time.LocalDateTime;
 public class TransactionDTO {
 
     private Long id;
-    private String fromAccountNumber;
-    private String toAccountNumber;
+    private Account fromAccount;
+    private Account toAccount;
     private BigDecimal amount;
     private LocalDateTime transactionDate;
     private String comment;
     private String typeoftransaction;
-
-    public TransactionDTO(Transaction transaction, String typeoftransaction) {
-        this.id = transaction.getId();
-        this.fromAccountNumber = transaction.getFromAccount().getAccountNumber();
-        this.toAccountNumber = transaction.getToAccount().getAccountNumber();
-        this.amount = transaction.getAmount();
-        this.transactionDate = transaction.getTransactionDate();
-        this.comment = transaction.getComment();
-        this.typeoftransaction = typeoftransaction;
-    }
 
     public Long getId() {
         return id;
@@ -33,20 +22,20 @@ public class TransactionDTO {
         this.id = id;
     }
 
-    public String getFromAccountNumber() {
-        return fromAccountNumber;
+    public Account getFromAccount() {
+        return fromAccount;
     }
 
-    public void setFromAccountNumber(String fromAccountNumber) {
-        this.fromAccountNumber = fromAccountNumber;
+    public void setFromAccount(Account fromAccount) {
+        this.fromAccount = fromAccount;
     }
 
-    public String getToAccountNumber() {
-        return toAccountNumber;
+    public Account getToAccount() {
+        return toAccount;
     }
 
-    public void setToAccountNumber(String toAccountNumber) {
-        this.toAccountNumber = toAccountNumber;
+    public void setToAccount(Account toAccount) {
+        this.toAccount = toAccount;
     }
 
     public BigDecimal getAmount() {
@@ -80,6 +69,4 @@ public class TransactionDTO {
     public void setTypeoftransaction(String typeoftransaction) {
         this.typeoftransaction = typeoftransaction;
     }
-
-    // Getters and Setters
 }
