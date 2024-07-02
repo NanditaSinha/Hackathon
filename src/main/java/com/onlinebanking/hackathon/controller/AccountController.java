@@ -33,12 +33,6 @@ public class AccountController {
     @Autowired
     private TransactionService transactionService;
 
-/*    @GetMapping
-    public List<Account> getAccounts(Principal principal) {
-        Customer customer = customerService.findByUsername(principal.getName()).orElseThrow(() -> new RuntimeException("Customer not found"));
-        return accountService.findByCustomer(customer);
-    }*/
-
     @GetMapping("/findAccountByCustomerId/{id}")
     public CollectionModel<EntityModel<Account>> findAccountByCustomerId(@PathVariable long id) {
         Optional<Customer> customerOpt = customerService.findById(id);
@@ -58,18 +52,6 @@ public class AccountController {
 
         return collectionModel;
     }
-
-/*    @GetMapping("/findAccountByUsername/{username}")
-    public ResponseEntity<EntityModel<Account>> findAccountByUsername(@PathVariable String username) {
-        Optional<Account> accountOpt = accountService.findAccountByUsername(username);
-        if (!accountOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        Account account = accountOpt.get();
-        EntityModel<Account> entityModel = EntityModel.of(account);
-        return ResponseEntity.ok(entityModel);
-    }*/
 
     @GetMapping("/findAccountByUsername/{username}")
     public CollectionModel<EntityModel<Account>> findAccountByCustomerId(@PathVariable String username) {
@@ -94,16 +76,6 @@ public class AccountController {
         return collectionModel;
     }
 
-
-/*   @GetMapping("/{id}/transactions")
-    public List<Transaction> getRecentTransactions(@PathVariable Long id, @RequestParam(defaultValue = "10") int limit) {
-       List<Account> account = accountService.findByCustomerId(id);
-       if (account.isEmpty()) {
-           throw new UserNotFoundException("No Transaction found for the account");
-       }
-        return transactionService.findRecentTransactions((Account) account, limit);
-    }*/
-
     @GetMapping("/accountdetail/{accountNumber}")
     public EntityModel<Account> getAccountByAccountNumber(@PathVariable Long accountNumber) {
         Account account = accountService.findByAccountNumber(accountNumber)
@@ -126,13 +98,6 @@ public class AccountController {
       Account createdAccount = accountService.createAccountUserName(username, account);
       return ResponseEntity.ok(createdAccount);
   }
-
-/*    @PostMapping("createaccountByusername/{username}")
-    public ResponseEntity<Account> createAccount(@PathVariable String username, @Valid @RequestBody AccountCreationRequest accountRequest) {
-        Account createdAccount = accountService.createAccount(username, accountRequest);
-        return ResponseEntity.ok(createdAccount);
-    }*/
-
     @GetMapping("/findAccountsByFromAccountNumber/{fromAccountNumber}")
     public CollectionModel<EntityModel<Account>> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
         Optional<Account> accountOpt = accountService.findByAccountNumber(fromAccountNumber);

@@ -104,9 +104,6 @@ public class AuthController {
         Customer customer = customerOpt.get();
         EntityModel<Customer> entityModel = EntityModel.of(customer);
 
-       /* WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).getAllCustomers());
-        entityModel.add(link.withRel("all-customers"));*/
-
         return entityModel;
     }
 

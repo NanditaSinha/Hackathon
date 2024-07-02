@@ -66,7 +66,7 @@ public class TransactionController {
         return transactionService.findLast10TransactionsByAccountNumber(accountNumber);
     }*/
 
-    @GetMapping("/last10/{accountNumber}")
+  /*  @GetMapping("/last10/{accountNumber}")
     public CollectionModel<Transaction> getLast10Transactions(@PathVariable Long accountNumber) {
         List<Transaction> transactions = transactionService.findLast10TransactionsByAccountNumber(accountNumber);
 
@@ -77,7 +77,7 @@ public class TransactionController {
         CollectionModel<Transaction> transactionResources = CollectionModel.of(transactions, accountLink);
 
         return transactionResources;
-    }
+    }*/
 
     @GetMapping("/transactionDetails/{id}")
     public Transaction transactionDetails(@PathVariable Long id) {
