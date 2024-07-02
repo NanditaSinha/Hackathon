@@ -29,6 +29,9 @@ public class TransactionService {
         Account fromAccount = accountRepository.findById(fromAccountId).orElseThrow(() -> new RuntimeException("Account not found"));
         Account toAccount = accountRepository.findById(toAccountId).orElseThrow(() -> new RuntimeException("Account not found"));
 
+        if (fromAccountId == toAccountId) {
+            throw new RuntimeException("From Account and To Account cannot be same");
+        }
         if (fromAccount.getBalance().compareTo(amount) < 0) {
             throw new RuntimeException("Insufficient funds");
         }
@@ -48,7 +51,9 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-    public List<Transaction> findLast10TransactionsByAccountNumber(String accountNumber) {
+
+
+    public List<Transaction> findLast10TransactionsByAccountNumber(Long accountNumber) {
         return transactionRepository.findFirst10ByFromAccount_AccountNumberOrderByTransactionDateDesc(accountNumber);
     }
 
@@ -61,7 +66,7 @@ public class TransactionService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }*/
 
-    public List<TransactionDTO> getLast10Transactions(String accountNumber) {
+    public List<TransactionDTO> getLast10Transactions(Long accountNumber) {
         List<Transaction> transactions = transactionRepository.findLast10TransactionsByAccountNumber(accountNumber);
         return transactions.stream().limit(10).map(transaction -> {
             TransactionDTO dto = new TransactionDTO();
@@ -79,7 +84,6 @@ public class TransactionService {
             return dto;
         }).collect(Collectors.toList());
     }
-
 
 }
 

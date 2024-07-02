@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Arrays;
 import java.util.List;
 
+import com.onlinebanking.hackathon.dto.LoginRequest;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;

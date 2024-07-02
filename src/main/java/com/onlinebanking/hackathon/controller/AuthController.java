@@ -1,5 +1,7 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.LoginRequest;
+import com.onlinebanking.hackathon.dto.LoginResponse;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.CustomerService;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +30,9 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RestTemplate restTemplate;
+    
     /*@PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         request.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -50,16 +57,34 @@ public class AuthController {
     }
 
     @PostMapping("/loginuser")
-    public ResponseEntity<?> loginuser(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> loginuser(@RequestBody LoginRequest request, UriComponentsBuilder uriComponentsBuilder) {
         Optional<Customer> customerOpt = customerService.findByUsername(request.getUsername());
 
 
         if (customerOpt.isPresent()) {
-            return ResponseEntity.ok().body("Login successful");
-        } else {
+            Customer customer = customerOpt.get();
+            if (customer.getPassword().equals(request.getPassword()))  {
+                String accountUrl = "/hackathon/accounts/findAccountByUsername/" + request.getUsername();
+                LoginResponse response = new LoginResponse("Login successful", accountUrl);
 
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-        }
+                /*String accountUrl = uriComponentsBuilder.path("/accounts/findAccountByUsername/{username}")
+                        .buildAndExpand(request.getUsername())
+                        .toUriString();
+
+                LoginResponseAccount response = new LoginResponseAccount("Login successful", accountUrl);
+                ResponseEntity<String> accountResponse = restTemplate.getForEntity(accountUrl, String.class);
+                if (accountResponse.getStatusCode() == HttpStatus.OK) {
+                    String accountDetails = accountResponse.getBody();
+                    response.setAccountDetails(accountDetails); // Assuming LoginResponse has an accountDetails field
+                }*/
+                
+                return ResponseEntity.ok().body(response);
+            } else {
+
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            }
+        }return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+
     }
 
     @GetMapping(path = "/findcustomers")
@@ -79,9 +104,6 @@ public class AuthController {
         Customer customer = customerOpt.get();
         EntityModel<Customer> entityModel = EntityModel.of(customer);
 
-       /* WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).getAllCustomers());
-        entityModel.add(link.withRel("all-customers"));*/
-
         return entityModel;
     }
 
@@ -93,8 +115,6 @@ public class AuthController {
 
 }
 
-@Data
-class LoginRequest {
-    private String username;
-    private String password;
-}
+
+
+

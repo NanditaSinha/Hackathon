@@ -1,6 +1,9 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.LoginResponse;
 import com.onlinebanking.hackathon.dto.TransactionDTO;
+import com.onlinebanking.hackathon.dto.TransferRequest;
+import com.onlinebanking.hackathon.dto.TransferRequestByAccountNumber;
 import com.onlinebanking.hackathon.entity.Transaction;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.TransactionService;
@@ -31,6 +34,21 @@ public class TransactionController {
         return ResponseEntity.ok().body("Transfer successful");
     }
 
+    @PostMapping("/transferfromAccount")
+    public ResponseEntity<?> transferFunds(@RequestBody TransferRequestByAccountNumber request) {
+
+        accountService.transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
+
+        String accountUrl = "/hackathon/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}" + request.getFromAccountNumber();
+        LoginResponse response = new LoginResponse("Transfer Successful", accountUrl);
+
+    /*    WebMvcLinkBuilder linkToFromAccount = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(this.getClass()).getAccountDetails(request.getFromAccountNumber()));*/
+
+
+        return ResponseEntity.ok().body(response);
+    }
+
  /* @PostMapping("/transfer")
     public ResponseEntity<?> transferFunds(@RequestBody TransferRequest request) {
         transactionService.transferFunds(request.getFromAccountId(), request.getToAccountId(), request.getAmount(), request.getComment());
@@ -48,8 +66,8 @@ public class TransactionController {
         return transactionService.findLast10TransactionsByAccountNumber(accountNumber);
     }*/
 
-    @GetMapping("/last10/{accountNumber}")
-    public CollectionModel<Transaction> getLast10Transactions(@PathVariable String accountNumber) {
+  /*  @GetMapping("/last10/{accountNumber}")
+    public CollectionModel<Transaction> getLast10Transactions(@PathVariable Long accountNumber) {
         List<Transaction> transactions = transactionService.findLast10TransactionsByAccountNumber(accountNumber);
 
         // Add link to account details
@@ -59,30 +77,33 @@ public class TransactionController {
         CollectionModel<Transaction> transactionResources = CollectionModel.of(transactions, accountLink);
 
         return transactionResources;
-    }
+    }*/
 
     @GetMapping("/transactionDetails/{id}")
     public Transaction transactionDetails(@PathVariable Long id) {
         return transactionService.findById(id);
     }
 
-   /* @GetMapping("/account/{id}")
+/*   @GetMapping("/account/{id}")
     public ResponseEntity<Account> getAccountDetails(@PathVariable Long id) {
         Account account = transactionService.getAccountDetails(id);
         return ResponseEntity.ok(account);
     }*/
 
     @GetMapping("/{accountNumber}/last10")
-    public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(@PathVariable String accountNumber) {
+    public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(@PathVariable Long accountNumber) {
         List<TransactionDTO> transactions = transactionService.getLast10Transactions(accountNumber);
         return ResponseEntity.ok(transactions);
     }
+
+/*    @GetMapping("/{accountNumber}")
+    public ResponseEntity<List<TransactionDTO>> getTransactions(@PathVariable String accountNumber) {
+        List<TransactionDTO> transactions = transactionService.getTransactions(accountNumber);
+        return ResponseEntity.ok(transactions);
+    }*/
+
 }
 
-@Data
-class TransferRequest {
-    private Long fromAccountId;
-    private Long toAccountId;
-    private BigDecimal amount;
-    private String comment;
-}
+
+
+
