@@ -66,7 +66,7 @@ public class TransactionService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }*/
 
-    public List<TransactionDTO> getLast10Transactions(String accountNumber) {
+    public List<TransactionDTO> getLast10Transactions(Long accountNumber) {
         List<Transaction> transactions = transactionRepository.findLast10TransactionsByAccountNumber(accountNumber);
         return transactions.stream().limit(10).map(transaction -> {
             TransactionDTO dto = new TransactionDTO();
@@ -84,6 +84,8 @@ public class TransactionService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+
 
 
 }

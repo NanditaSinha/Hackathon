@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,15 +56,20 @@ public class AccountController {
 
         CollectionModel<EntityModel<Account>> collectionModel = CollectionModel.of(accountModels);
 
-
-        // Uncomment and adjust the HATEOAS link part if needed
-        /*
-        WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).getAllCustomers());
-        entityModel.add(link.withRel("all-customers"));
-        */
-
         return collectionModel;
     }
+
+/*    @GetMapping("/findAccountByUsername/{username}")
+    public ResponseEntity<EntityModel<Account>> findAccountByUsername(@PathVariable String username) {
+        Optional<Account> accountOpt = accountService.findAccountByUsername(username);
+        if (!accountOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        Account account = accountOpt.get();
+        EntityModel<Account> entityModel = EntityModel.of(account);
+        return ResponseEntity.ok(entityModel);
+    }*/
 
     @GetMapping("/findAccountByUsername/{username}")
     public CollectionModel<EntityModel<Account>> findAccountByCustomerId(@PathVariable String username) {
@@ -82,11 +88,9 @@ public class AccountController {
 
         CollectionModel<EntityModel<Account>> collectionModel = CollectionModel.of(accountModels);
 
+       /* WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).getAllCustomers());
+        entityModel.add(link.withRel("all-customers"));*/
 
-        /*
-        WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).getAllCustomers());
-        entityModel.add(link.withRel("all-customers"));
-        */
         return collectionModel;
     }
 
@@ -129,10 +133,23 @@ public class AccountController {
         return ResponseEntity.ok(createdAccount);
     }*/
 
-/*    @GetMapping("/{accountId}")
-    public ResponseEntity<Account> getAccountDetails(@PathVariable Long accountId) {
-        Account account = accountService.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
-        return ResponseEntity.ok(account);
-    }*/
+    @GetMapping("/findAccountsByFromAccountNumber/{fromAccountNumber}")
+    public CollectionModel<EntityModel<Account>> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
+        Optional<Account> accountOpt = accountService.findByAccountNumber(fromAccountNumber);
+
+        if (!accountOpt.isPresent()) {
+            throw new UserNotFoundException("Account with number " + fromAccountNumber + " not found");
+        }
+
+        Account account = accountOpt.get();
+        Customer customer = account.getCustomer();
+        List<Account> accounts = accountService.findByCustomer(customer);
+
+        List<EntityModel<Account>> accountModels = accounts.stream()
+                .map(EntityModel::of)
+                .toList();
+
+        return CollectionModel.of(accountModels);
+    }
+
 }

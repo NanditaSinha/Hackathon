@@ -1,5 +1,6 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.LoginRequest;
 import com.onlinebanking.hackathon.dto.LoginResponse;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
@@ -118,20 +119,5 @@ public class AuthController {
 }
 
 
-@Data
-class LoginRequest {
-    private String username;
-    private String password;
-}
 
-@Data
-class LoginResponseAccount {
-    private String message;
-    private String accountUrl;
-    private String accountDetails; // Added to hold account details if fetched
 
-    public LoginResponseAccount(String message, String accountUrl) {
-        this.message = message;
-        this.accountUrl = accountUrl;
-    }
-}

@@ -1,6 +1,9 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.LoginResponse;
 import com.onlinebanking.hackathon.dto.TransactionDTO;
+import com.onlinebanking.hackathon.dto.TransferRequest;
+import com.onlinebanking.hackathon.dto.TransferRequestByAccountNumber;
 import com.onlinebanking.hackathon.entity.Transaction;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.TransactionService;
@@ -32,10 +35,18 @@ public class TransactionController {
     }
 
     @PostMapping("/transferfromAccount")
-    public ResponseEntity<String> transferFunds(@RequestBody TransferRequestByAccountNumber request) {
+    public ResponseEntity<?> transferFunds(@RequestBody TransferRequestByAccountNumber request) {
 
         accountService.transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
-        return ResponseEntity.ok("Transfer successful");
+
+        String accountUrl = "/hackathon/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}" + request.getFromAccountNumber();
+        LoginResponse response = new LoginResponse("Transfer Successful", accountUrl);
+
+    /*    WebMvcLinkBuilder linkToFromAccount = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(this.getClass()).getAccountDetails(request.getFromAccountNumber()));*/
+
+
+        return ResponseEntity.ok().body(response);
     }
 
  /* @PostMapping("/transfer")
@@ -73,31 +84,26 @@ public class TransactionController {
         return transactionService.findById(id);
     }
 
-   /* @GetMapping("/account/{id}")
+/*   @GetMapping("/account/{id}")
     public ResponseEntity<Account> getAccountDetails(@PathVariable Long id) {
         Account account = transactionService.getAccountDetails(id);
         return ResponseEntity.ok(account);
     }*/
 
     @GetMapping("/{accountNumber}/last10")
-    public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(@PathVariable String accountNumber) {
+    public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(@PathVariable Long accountNumber) {
         List<TransactionDTO> transactions = transactionService.getLast10Transactions(accountNumber);
         return ResponseEntity.ok(transactions);
     }
+
+/*    @GetMapping("/{accountNumber}")
+    public ResponseEntity<List<TransactionDTO>> getTransactions(@PathVariable String accountNumber) {
+        List<TransactionDTO> transactions = transactionService.getTransactions(accountNumber);
+        return ResponseEntity.ok(transactions);
+    }*/
+
 }
 
-@Data
-class TransferRequest {
-    private Long fromAccountId;
-    private Long toAccountId;
-    private BigDecimal amount;
-    private String comment;
-}
 
-@Data
-class TransferRequestByAccountNumber {
-    private Long fromAccountNumber;
-    private Long toAccountNumber;
-    private BigDecimal amount;
-    private String comment;
-}
+
+

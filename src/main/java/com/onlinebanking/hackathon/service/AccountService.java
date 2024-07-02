@@ -39,6 +39,10 @@ public class AccountService {
         return accountRepository.findByCustomer(customer);
     }
 
+    public Optional<Account> findAccountByUsername(String username) {
+        return accountRepository.findAccountByCustomer_Username(username);
+    }
+
     public List<Account> findByCustomerUsername(String username) {
         Customer customer = customerService.findByUsername(username).orElseThrow(() -> new RuntimeException("Customer not found"));
         return accountRepository.findByCustomer(customer);
