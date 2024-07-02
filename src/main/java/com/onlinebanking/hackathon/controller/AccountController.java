@@ -1,5 +1,6 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.AccountCreationRequest;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
@@ -99,8 +100,8 @@ public class AccountController {
         return transactionService.findRecentTransactions((Account) account, limit);
     }*/
 
-    @GetMapping("/{accountNumber}")
-    public EntityModel<Account> getAccountByAccountNumber(@PathVariable String accountNumber) {
+    @GetMapping("/accountdetail/{accountNumber}")
+    public EntityModel<Account> getAccountByAccountNumber(@PathVariable Long accountNumber) {
         Account account = accountService.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
@@ -116,11 +117,17 @@ public class AccountController {
         return ResponseEntity.ok(createdAccount);
     }
 
-    @PostMapping("/createaccountByusername/{username}")
-    public ResponseEntity<Account> createAccountByUserName(@PathVariable String username, @Valid @RequestBody Account account) {
-        Account createdAccount = accountService.createAccountUserName(username, account);
+  @PostMapping("/createaccountByusername/{username}")
+  public ResponseEntity<Account> createAccountByUserName(@PathVariable String username, @Valid @RequestBody Account account) {
+      Account createdAccount = accountService.createAccountUserName(username, account);
+      return ResponseEntity.ok(createdAccount);
+  }
+
+/*    @PostMapping("createaccountByusername/{username}")
+    public ResponseEntity<Account> createAccount(@PathVariable String username, @Valid @RequestBody AccountCreationRequest accountRequest) {
+        Account createdAccount = accountService.createAccount(username, accountRequest);
         return ResponseEntity.ok(createdAccount);
-    }
+    }*/
 
 /*    @GetMapping("/{accountId}")
     public ResponseEntity<Account> getAccountDetails(@PathVariable Long accountId) {

@@ -9,8 +9,8 @@ VALUES ('NeelamPrasad', 'Neelam', 'Prasad', 'password123','neelam.prasad@gmail.c
 
 
 INSERT INTO Account (id, customer_id, account_Number, balance)
-VALUES (1, 1, 'ACC001', 1000.00),
-       (2, 2, 'ACC002', 500.50),
+VALUES (1, 1, '100007', 1000.00),
+       (2, 2, '100008', 500.50),
        (3, 1, '100001', 1000.00),
        (4, 2, '100002', 1500.50),
        (5, 3, '100003', 5200.50),

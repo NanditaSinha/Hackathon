@@ -16,14 +16,14 @@ public class Account {
     private Customer customer;
 
     @Column(unique = true)
-    private String accountNumber;
+    private Long accountNumber;
 
     private BigDecimal balance;
 
     public Account() {
     }
 
-    public Account(Long id, Customer customer, String accountNumber, BigDecimal balance) {
+    public Account(Long id, Customer customer, Long accountNumber, BigDecimal balance) {
         this.id = id;
         this.customer = customer;
         this.accountNumber = accountNumber;
@@ -47,11 +47,11 @@ public class Account {
         this.customer = customer;
     }
 
-    public String getAccountNumber() {
+    public Long getAccountNumber() {
         return accountNumber;
     }
 
-    public void setAccountNumber(String accountNumber) {
+    public void setAccountNumber(Long accountNumber) {
         this.accountNumber = accountNumber;
     }
 

@@ -31,6 +31,13 @@ public class TransactionController {
         return ResponseEntity.ok().body("Transfer successful");
     }
 
+    @PostMapping("/transferfromAccount")
+    public ResponseEntity<String> transferFunds(@RequestBody TransferRequestByAccountNumber request) {
+
+        accountService.transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
+        return ResponseEntity.ok("Transfer successful");
+    }
+
  /* @PostMapping("/transfer")
     public ResponseEntity<?> transferFunds(@RequestBody TransferRequest request) {
         transactionService.transferFunds(request.getFromAccountId(), request.getToAccountId(), request.getAmount(), request.getComment());
@@ -49,7 +56,7 @@ public class TransactionController {
     }*/
 
     @GetMapping("/last10/{accountNumber}")
-    public CollectionModel<Transaction> getLast10Transactions(@PathVariable String accountNumber) {
+    public CollectionModel<Transaction> getLast10Transactions(@PathVariable Long accountNumber) {
         List<Transaction> transactions = transactionService.findLast10TransactionsByAccountNumber(accountNumber);
 
         // Add link to account details
@@ -83,6 +90,14 @@ public class TransactionController {
 class TransferRequest {
     private Long fromAccountId;
     private Long toAccountId;
+    private BigDecimal amount;
+    private String comment;
+}
+
+@Data
+class TransferRequestByAccountNumber {
+    private Long fromAccountNumber;
+    private Long toAccountNumber;
     private BigDecimal amount;
     private String comment;
 }

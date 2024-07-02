@@ -29,6 +29,9 @@ public class TransactionService {
         Account fromAccount = accountRepository.findById(fromAccountId).orElseThrow(() -> new RuntimeException("Account not found"));
         Account toAccount = accountRepository.findById(toAccountId).orElseThrow(() -> new RuntimeException("Account not found"));
 
+        if (fromAccountId == toAccountId) {
+            throw new RuntimeException("From Account and To Account cannot be same");
+        }
         if (fromAccount.getBalance().compareTo(amount) < 0) {
             throw new RuntimeException("Insufficient funds");
         }
@@ -48,7 +51,9 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-    public List<Transaction> findLast10TransactionsByAccountNumber(String accountNumber) {
+
+
+    public List<Transaction> findLast10TransactionsByAccountNumber(Long accountNumber) {
         return transactionRepository.findFirst10ByFromAccount_AccountNumberOrderByTransactionDateDesc(accountNumber);
     }
 
