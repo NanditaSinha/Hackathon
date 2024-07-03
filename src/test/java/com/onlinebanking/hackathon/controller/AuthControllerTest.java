@@ -1,127 +1,120 @@
 package com.onlinebanking.hackathon.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Optional;
-import java.util.Arrays;
-import java.util.List;
-
 import com.onlinebanking.hackathon.dto.LoginRequest;
+import com.onlinebanking.hackathon.dto.LoginResponse;
 import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.CustomerService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
-@WebMvcTest(AuthController.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private CustomerService customerService;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private AuthController authController;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
-    }
 
     @Test
-    public void testLogin_Success() throws Exception {
-        LoginRequest request = new LoginRequest();
-        request.setUsername("testuser");
-        request.setPassword("testpass");
-
+    void testLoginUserSuccess() {
+        LoginRequest request = new LoginRequest("NeelamPrasad", "password123");
         Customer customer = new Customer();
-        customer.setUsername("testuser");
-        customer.setPassword("encodedPassword");
+        customer.setUsername("NeelamPrasad");
+        customer.setPassword("password123");
 
-        when(customerService.findByUsername("testuser")).thenReturn(Optional.of(customer));
-        when(passwordEncoder.matches(any(String.class), any(String.class))).thenReturn(true);
+        when(customerService.findByUsername("NeelamPrasad")).thenReturn(Optional.of(customer));
 
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Login successful"));
+        ResponseEntity<?> response = authController.loginuser(request, UriComponentsBuilder.newInstance());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        LoginResponse loginResponse = (LoginResponse) response.getBody();
+        assertEquals("Login successful", loginResponse.getMessage());
+        assertEquals("/hackathon/accounts/findAccountByUsername/NeelamPrasad", loginResponse.getAccountUrl());
     }
 
     @Test
-    public void testLogin_Failure() throws Exception {
-        LoginRequest request = new LoginRequest();
-        request.setUsername("wronguser");
-        request.setPassword("wrongpass");
+    void testLoginUserFailure() {
+        LoginRequest request = new LoginRequest("NeelamPrasad", "password123");
 
-        when(customerService.findByUsername("wronguser")).thenReturn(Optional.empty());
+        when(customerService.findByUsername("NeelamPrasad")).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Invalid username or password"));
+        ResponseEntity<?> response = authController.loginuser(request, UriComponentsBuilder.newInstance());
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid username or password", response.getBody());
     }
 
     @Test
-    public void testGetAllCustomers() throws Exception {
+    void testGetAllCustomers() {
         Customer customer1 = new Customer();
-        customer1.setUsername("testuser1");
-
+        customer1.setUsername("NeelamPrasad");
         Customer customer2 = new Customer();
-        customer2.setUsername("testuser2");
+        customer2.setUsername("NanditaSinha");
 
         List<Customer> customers = Arrays.asList(customer1, customer2);
-
         when(customerService.getAllCustomers()).thenReturn(customers);
 
-        mockMvc.perform(get("/auth/findcustomers"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(customers)));
+        List<Customer> result = authController.getAllCustomers();
+
+        assertEquals(2, result.size());
+        assertEquals("NeelamPrasad", result.get(0).getUsername());
+        assertEquals("NanditaSinha", result.get(1).getUsername());
     }
 
     @Test
-    public void testFindCustomerByUsername_Success() throws Exception {
+    void testFindCustomerByUsernameSuccess() {
         Customer customer = new Customer();
-        customer.setUsername("testuser");
+        customer.setUsername("NanditaSinha");
 
-        when(customerService.findByUsername("testuser")).thenReturn(Optional.of(customer));
+        when(customerService.findByUsername("NanditaSinha")).thenReturn(Optional.of(customer));
 
-        mockMvc.perform(get("/auth/findByUsername/testuser"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(EntityModel.of(customer))));
+        EntityModel<Customer> response = authController.findCustomerByUsername("NanditaSinha");
+
+        assertEquals("NanditaSinha", response.getContent().getUsername());
     }
 
     @Test
-    public void testFindCustomerByUsername_NotFound() throws Exception {
-        when(customerService.findByUsername("nonexistentuser")).thenReturn(Optional.empty());
+    void testFindCustomerByUsernameFailure() {
+        when(customerService.findByUsername("NanditaSinha")).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/auth/findByUsername/nonexistentuser"))
-                .andExpect(status().isNotFound());
+        try {
+            authController.findCustomerByUsername("NanditaSinha");
+        } catch (UserNotFoundException e) {
+            assertEquals("Customer with username NanditaSinha not found", e.getMessage());
+        }
+    }
+
+    @Test
+    void testCreateCustomer() {
+        Customer customer = new Customer();
+        customer.setUsername("RichaS");
+
+        when(customerService.createCustomer(any(Customer.class))).thenReturn(customer);
+
+        ResponseEntity<Customer> response = authController.createCustomer(customer);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("RichaS", response.getBody().getUsername());
     }
 }

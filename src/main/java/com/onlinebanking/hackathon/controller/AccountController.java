@@ -1,6 +1,5 @@
 package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.dto.AccountCreationRequest;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
@@ -11,15 +10,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/accounts")
@@ -93,11 +88,12 @@ public class AccountController {
         return ResponseEntity.ok(createdAccount);
     }
 
-  @PostMapping("/createaccountByusername/{username}")
-  public ResponseEntity<Account> createAccountByUserName(@PathVariable String username, @Valid @RequestBody Account account) {
-      Account createdAccount = accountService.createAccountUserName(username, account);
-      return ResponseEntity.ok(createdAccount);
-  }
+    @PostMapping("/createaccountByusername/{username}")
+    public ResponseEntity<Account> createAccountByUserName(@PathVariable String username, @Valid @RequestBody Account account) {
+        Account createdAccount = accountService.createAccountUserName(username, account);
+        return ResponseEntity.ok(createdAccount);
+    }
+
     @GetMapping("/findAccountsByFromAccountNumber/{fromAccountNumber}")
     public CollectionModel<EntityModel<Account>> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
         Optional<Account> accountOpt = accountService.findByAccountNumber(fromAccountNumber);
