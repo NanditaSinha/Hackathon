@@ -8,8 +8,6 @@ import com.onlinebanking.hackathon.service.CustomerService;
 import com.onlinebanking.hackathon.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +27,7 @@ public class AccountController {
     private TransactionService transactionService;
 
     @GetMapping("/findAccountByCustomerId/{id}")
-    public CollectionModel<EntityModel<Account>> findAccountByCustomerId(@PathVariable long id) {
+    public List<Account> findAccountByCustomerId(@PathVariable long id) {
         Optional<Customer> customerOpt = customerService.findById(id);
 
         if (!customerOpt.isPresent()) {
@@ -38,18 +36,11 @@ public class AccountController {
 
         Customer customer = customerOpt.get();
         List<Account> accounts = accountService.findByCustomer(customer);
-
-        List<EntityModel<Account>> accountModels = accounts.stream()
-                .map(account -> EntityModel.of(account))
-                .toList();
-
-        CollectionModel<EntityModel<Account>> collectionModel = CollectionModel.of(accountModels);
-
-        return collectionModel;
+        return accounts;
     }
 
     @GetMapping("/findAccountByUsername/{username}")
-    public CollectionModel<EntityModel<Account>> findAccountByCustomerId(@PathVariable String username) {
+    public List<Account> findAccountByCustomerId(@PathVariable String username) {
         Optional<Customer> customerOpt = customerService.findByUsername(username);
 
         if (!customerOpt.isPresent()) {
@@ -59,24 +50,15 @@ public class AccountController {
         Customer customer = customerOpt.get();
         List<Account> accounts = accountService.findByCustomer(customer);
 
-        List<EntityModel<Account>> accountModels = accounts.stream()
-                .map(account -> EntityModel.of(account))
-                .toList();
-
-        CollectionModel<EntityModel<Account>> collectionModel = CollectionModel.of(accountModels);
-
-       /* WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).getAllCustomers());
-        entityModel.add(link.withRel("all-customers"));*/
-
-        return collectionModel;
+        return accounts;
     }
 
     @GetMapping("/accountdetail/{accountNumber}")
-    public EntityModel<Account> getAccountByAccountNumber(@PathVariable Long accountNumber) {
+    public Account getAccountByAccountNumber(@PathVariable Long accountNumber) {
         Account account = accountService.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        return EntityModel.of(account);
+        return account;
     }
 
     @PostMapping("/createaccountBycustomerid/{customerId}")
@@ -95,7 +77,7 @@ public class AccountController {
     }
 
     @GetMapping("/findAccountsByFromAccountNumber/{fromAccountNumber}")
-    public CollectionModel<EntityModel<Account>> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
+    public List<Account> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
         Optional<Account> accountOpt = accountService.findByAccountNumber(fromAccountNumber);
 
         if (!accountOpt.isPresent()) {
@@ -106,11 +88,7 @@ public class AccountController {
         Customer customer = account.getCustomer();
         List<Account> accounts = accountService.findByCustomer(customer);
 
-        List<EntityModel<Account>> accountModels = accounts.stream()
-                .map(EntityModel::of)
-                .toList();
-
-        return CollectionModel.of(accountModels);
+        return accounts;
     }
 
 }
