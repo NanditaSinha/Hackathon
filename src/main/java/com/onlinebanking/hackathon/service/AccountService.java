@@ -74,7 +74,7 @@ public class AccountService {
 
         Optional<Customer> customerOptional = customerRepository.findByUsername(username);
         if (customerOptional.isEmpty()) {
-            throw new RuntimeException("Customer not found with this user name");
+            throw new RuntimeException("Customer not found with this user name: " + username);
         }
         Customer customer = customerOptional.get();
         accountDetails.setCustomer(customer);

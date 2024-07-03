@@ -6,7 +6,6 @@ import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.CustomerService;
 import jakarta.validation.Valid;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -18,8 +17,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,7 +42,7 @@ public class AuthController {
         }
     }*/
 
-    @PostMapping("/login")
+   /* @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Optional<Customer> customerOpt = customerService.findByUsername(request.getUsername());
 
@@ -55,7 +52,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
     }
-
+*/
     @PostMapping("/loginuser")
     public ResponseEntity<?> loginuser(@RequestBody LoginRequest request, UriComponentsBuilder uriComponentsBuilder) {
         Optional<Customer> customerOpt = customerService.findByUsername(request.getUsername());
@@ -63,7 +60,7 @@ public class AuthController {
 
         if (customerOpt.isPresent()) {
             Customer customer = customerOpt.get();
-            if (customer.getPassword().equals(request.getPassword()))  {
+            if (customer.getPassword().equals(request.getPassword())) {
                 String accountUrl = "/hackathon/accounts/findAccountByUsername/" + request.getUsername();
                 LoginResponse response = new LoginResponse("Login successful", accountUrl);
 
@@ -77,13 +74,14 @@ public class AuthController {
                     String accountDetails = accountResponse.getBody();
                     response.setAccountDetails(accountDetails); // Assuming LoginResponse has an accountDetails field
                 }*/
-                
+
                 return ResponseEntity.ok().body(response);
             } else {
 
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
             }
-        }return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
 
     }
 

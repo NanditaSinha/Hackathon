@@ -7,16 +7,10 @@ import com.onlinebanking.hackathon.dto.TransferRequestByAccountNumber;
 import com.onlinebanking.hackathon.entity.Transaction;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.TransactionService;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @RestController
