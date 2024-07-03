@@ -36,65 +36,22 @@ public class TransactionController {
         String accountUrl = "/hackathon/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}" + request.getFromAccountNumber();
         LoginResponse response = new LoginResponse("Transfer Successful", accountUrl);
 
-    /*    WebMvcLinkBuilder linkToFromAccount = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(this.getClass()).getAccountDetails(request.getFromAccountNumber()));*/
-
 
         return ResponseEntity.ok().body(response);
     }
 
- /* @PostMapping("/transfer")
-    public ResponseEntity<?> transferFunds(@RequestBody TransferRequest request) {
-        transactionService.transferFunds(request.getFromAccountId(), request.getToAccountId(), request.getAmount(), request.getComment());
-
-        WebMvcLinkBuilder linkToFromAccount = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(this.getClass()).getAccountDetails(request.getFromAccountId()));
-
-
-        return ResponseEntity.ok(EntityModel.of("Transfer successful")
-                .add(linkToFromAccount.withRel("fromAccountDetails")));
-    }*/
-
-   /* @GetMapping("/last10/{accountNumber}")
-    public List<Transaction> getLast10Transactions(@PathVariable String accountNumber) {
-        return transactionService.findLast10TransactionsByAccountNumber(accountNumber);
-    }*/
-
-  /*  @GetMapping("/last10/{accountNumber}")
-    public CollectionModel<Transaction> getLast10Transactions(@PathVariable Long accountNumber) {
-        List<Transaction> transactions = transactionService.findLast10TransactionsByAccountNumber(accountNumber);
-
-        // Add link to account details
-        Link accountLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AccountController.class)
-                .getAccountByAccountNumber(accountNumber)).withRel("account-details");
-
-        CollectionModel<Transaction> transactionResources = CollectionModel.of(transactions, accountLink);
-
-        return transactionResources;
-    }*/
 
     @GetMapping("/transactionDetails/{id}")
     public Transaction transactionDetails(@PathVariable Long id) {
         return transactionService.findById(id);
     }
 
-/*   @GetMapping("/account/{id}")
-    public ResponseEntity<Account> getAccountDetails(@PathVariable Long id) {
-        Account account = transactionService.getAccountDetails(id);
-        return ResponseEntity.ok(account);
-    }*/
 
     @GetMapping("/{accountNumber}/last10")
     public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(@PathVariable Long accountNumber) {
         List<TransactionDTO> transactions = transactionService.getLast10Transactions(accountNumber);
         return ResponseEntity.ok(transactions);
     }
-
-/*    @GetMapping("/{accountNumber}")
-    public ResponseEntity<List<TransactionDTO>> getTransactions(@PathVariable String accountNumber) {
-        List<TransactionDTO> transactions = transactionService.getTransactions(accountNumber);
-        return ResponseEntity.ok(transactions);
-    }*/
 
 }
 
