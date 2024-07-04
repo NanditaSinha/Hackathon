@@ -2,7 +2,6 @@ package com.onlinebanking.hackathon.controller;
 
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
-import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.CustomerService;
 import com.onlinebanking.hackathon.service.TransactionService;
@@ -17,7 +16,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -60,8 +58,8 @@ class AccountControllerTest {
         mockMvc.perform(get("/accounts/findAccountByCustomerId/{id}", customerId))
                 .andExpect(status().isOk());
 
-        verify(customerService, times(1)).findById(customerId);
-        verify(accountService, times(1)).findByCustomer(customer);
+        verify(customerService).findById(customerId);
+        verify(accountService).findByCustomer(customer);
     }
 
     @Test
@@ -73,12 +71,12 @@ class AccountControllerTest {
         mockMvc.perform(get("/accounts/findAccountByCustomerId/{id}", customerId))
                 .andExpect(status().isNotFound());
 
-        verify(customerService, times(1)).findById(customerId);
+        verify(customerService).findById(customerId);
     }
 
     @Test
     void testFindAccountByUsernameSuccess() throws Exception {
-        String username = "testuser";
+        String username = "NanditaSinha";
         Customer customer = new Customer();
         customer.setUsername(username);
         Account account = new Account();
@@ -91,20 +89,20 @@ class AccountControllerTest {
         mockMvc.perform(get("/accounts/findAccountByUsername/{username}", username))
                 .andExpect(status().isOk());
 
-        verify(customerService, times(1)).findByUsername(username);
-        verify(accountService, times(1)).findByCustomer(customer);
+        verify(customerService).findByUsername(username);
+        verify(accountService).findByCustomer(customer);
     }
 
     @Test
     void testFindAccountByUsernameNotFound() throws Exception {
-        String username = "testuser";
+        String username = "NanditaSinha";
 
         when(customerService.findByUsername(username)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/accounts/findAccountByUsername/{username}", username))
                 .andExpect(status().isNotFound());
 
-        verify(customerService, times(1)).findByUsername(username);
+        verify(customerService).findByUsername(username);
     }
 
     @Test
@@ -118,7 +116,7 @@ class AccountControllerTest {
         mockMvc.perform(get("/accounts/accountdetail/{accountNumber}", accountNumber))
                 .andExpect(status().isOk());
 
-        verify(accountService, times(1)).findByAccountNumber(accountNumber);
+        verify(accountService).findByAccountNumber(accountNumber);
     }
 
     @Test
@@ -134,7 +132,7 @@ class AccountControllerTest {
                         .content("{\"accountNumber\": 12345}"))
                 .andExpect(status().isOk());
 
-        verify(accountService, times(1)).createAccount(any(Account.class), eq(customerId));
+        verify(accountService).createAccount(any(Account.class), eq(customerId));
     }
 
   /*  @Test
@@ -153,7 +151,7 @@ class AccountControllerTest {
 
     @Test
     void testCreateAccountByUsernameSuccess() throws Exception {
-        String username = "testuser";
+        String username = "NanditaSinha";
         Account account = new Account();
 
         when(accountService.createAccountUserName(eq(username), any(Account.class))).thenReturn(account);
@@ -163,7 +161,7 @@ class AccountControllerTest {
                         .content("{\"accountNumber\": 12345}"))
                 .andExpect(status().isOk());
 
-        verify(accountService, times(1)).createAccountUserName(eq(username), any(Account.class));
+        verify(accountService).createAccountUserName(eq(username), any(Account.class));
     }
 
     @Test
@@ -180,8 +178,8 @@ class AccountControllerTest {
         mockMvc.perform(get("/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}", fromAccountNumber))
                 .andExpect(status().isOk());
 
-        verify(accountService, times(1)).findByAccountNumber(fromAccountNumber);
-        verify(accountService, times(1)).findByCustomer(customer);
+        verify(accountService).findByAccountNumber(fromAccountNumber);
+        verify(accountService).findByCustomer(customer);
     }
 
     @Test
@@ -193,6 +191,6 @@ class AccountControllerTest {
         mockMvc.perform(get("/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}", fromAccountNumber))
                 .andExpect(status().isNotFound());
 
-        verify(accountService, times(1)).findByAccountNumber(fromAccountNumber);
+        verify(accountService).findByAccountNumber(fromAccountNumber);
     }
 }
