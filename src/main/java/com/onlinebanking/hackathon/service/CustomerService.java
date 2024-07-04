@@ -28,7 +28,7 @@ public class CustomerService {
 
     public Customer createCustomer(Customer customer) {
         if (usernameExists(customer.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new RuntimeException("Username already exists");
         }
         return customerRepository.save(customer);
     }

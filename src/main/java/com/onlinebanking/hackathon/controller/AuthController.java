@@ -26,9 +26,6 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
     @PostMapping("/loginuser")
     public ResponseEntity<?> loginuser(@RequestBody LoginRequest request, UriComponentsBuilder uriComponentsBuilder) {
         Optional<Customer> customerOpt = customerService.findByUsername(request.getUsername());

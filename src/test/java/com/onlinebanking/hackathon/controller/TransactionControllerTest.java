@@ -2,7 +2,6 @@ package com.onlinebanking.hackathon.controller;
 
 import com.onlinebanking.hackathon.dto.LoginResponse;
 import com.onlinebanking.hackathon.dto.TransactionDTO;
-import com.onlinebanking.hackathon.dto.TransferRequest;
 import com.onlinebanking.hackathon.dto.TransferRequestByAccountNumber;
 import com.onlinebanking.hackathon.entity.Transaction;
 import com.onlinebanking.hackathon.service.AccountService;
@@ -19,8 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 class TransactionControllerTest {
@@ -63,12 +60,12 @@ class TransactionControllerTest {
         request.setAmount(BigDecimal.valueOf(100.0));
         request.setComment("Test by account number");
 
-        doNothing().when(accountService).transferFundsfromAccount(123456789L, 987654321L, BigDecimal.valueOf( 100.00), "Test by account number");
+        doNothing().when(accountService).transferFundsfromAccount(123456789L, 987654321L, BigDecimal.valueOf(100.00), "Test by account number");
 
         ResponseEntity<?> response = transactionController.transferFunds(request);
 
         assertEquals("Transfer Successful", ((LoginResponse) response.getBody()).getMessage());
-        verify(accountService, times(1)).transferFundsfromAccount(123456789L, 987654321L, BigDecimal.valueOf( 100.00), "Test by account number");
+        verify(accountService).transferFundsfromAccount(123456789L, 987654321L, BigDecimal.valueOf(100.00), "Test by account number");
     }
 
     @Test
@@ -81,7 +78,7 @@ class TransactionControllerTest {
         ResponseEntity<List<TransactionDTO>> response = transactionController.getLast10TransactionsbyAccountnumber(accountNumber);
 
         assertEquals(transactionDTOList, response.getBody());
-        verify(transactionService, times(1)).getLast10Transactions(accountNumber);
+        verify(transactionService).getLast10Transactions(accountNumber);
     }
 
     @Test
@@ -94,6 +91,6 @@ class TransactionControllerTest {
         Transaction result = transactionController.transactionDetails(transactionId);
 
         assertEquals(transaction, result);
-        verify(transactionService, times(1)).findById(transactionId);
+        verify(transactionService).findById(transactionId);
     }
 }
