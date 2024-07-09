@@ -27,24 +27,19 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/loginuser")
-    public ResponseEntity<?> loginuser(@RequestBody LoginRequest request, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<String> loginuser(@RequestBody LoginRequest request, UriComponentsBuilder uriComponentsBuilder) {
         Optional<Customer> customerOpt = customerService.findByUsername(request.getUsername());
 
 
         if (customerOpt.isPresent()) {
             Customer customer = customerOpt.get();
-            if (customer.getPassword().equals(request.getPassword())) {
-                String accountUrl = "/hackathon/accounts/findAccountByUsername/" + request.getUsername();
-                LoginResponse response = new LoginResponse("Login successful", accountUrl);
-
-                return ResponseEntity.ok(response);
+            if (passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
+                return ResponseEntity.ok("Login successful");
             } else {
-
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-
     }
 
     @GetMapping(path = "/findcustomers")
