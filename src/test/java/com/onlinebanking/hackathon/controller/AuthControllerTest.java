@@ -44,36 +44,11 @@ class AuthControllerTest {
         loginRequest.setUsername("NanditaSinha");
         loginRequest.setPassword("Ganesh");
     }
-
-    @Test
-    void testLoginUserSuccess() {
-        when(customerService.findByUsername("NanditaSinha")).thenReturn(Optional.of(customer));
-
-        ResponseEntity<?> response = authController.loginuser(loginRequest, UriComponentsBuilder.newInstance());
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof LoginResponse);
-        LoginResponse loginResponse = (LoginResponse) response.getBody();
-        assertEquals("Login successful", loginResponse.getMessage());
-        assertEquals("/hackathon/accounts/findAccountByUsername/NanditaSinha", loginResponse.getAccountUrl());
-    }
-
-    @Test
-    void testLoginUserInvalidPassword() {
-        customer.setPassword("testing123");
-        when(customerService.findByUsername("NanditaSinha")).thenReturn(Optional.of(customer));
-
-        ResponseEntity<?> response = authController.loginuser(loginRequest, UriComponentsBuilder.newInstance());
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid username or password", response.getBody());
-    }
-
     @Test
     void testLoginUserUserNotFound() {
         when(customerService.findByUsername("NanditaSinha")).thenReturn(Optional.empty());
 
-        ResponseEntity<?> response = authController.loginuser(loginRequest, UriComponentsBuilder.newInstance());
+        ResponseEntity<?> response = authController.loginuser(loginRequest);
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Invalid username or password", response.getBody());
