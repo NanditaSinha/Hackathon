@@ -84,6 +84,5 @@ public class TransactionService {
             return dto;
         }).collect(Collectors.toList());
     }
-
 }
 
