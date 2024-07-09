@@ -97,11 +97,14 @@ class AuthControllerTest {
 
     @Test
     void testCreateCustomer() {
+        Customer customer = new Customer();
+        customer.setUsername("RichaS");
+
         when(customerService.createCustomer(any(Customer.class))).thenReturn(customer);
 
         ResponseEntity<Customer> response = authController.createCustomer(customer);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(customer, response.getBody());
+        assertEquals("RichaS", response.getBody().getUsername());
     }
 }
