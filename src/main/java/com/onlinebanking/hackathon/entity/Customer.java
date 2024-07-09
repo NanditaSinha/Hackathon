@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -20,8 +21,9 @@ public class Customer {
     private String firstname;
 
     private String lastname;
-
-    @Size(min = 5, message = "Password should have at least 5 characters")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+            message = "Password must be 8 characters long, contain one digit, one uppercase letter, " +
+                      "one lowercase letter, and one special character")
     private String password;
 
     @Email(message = "Email should be valid")

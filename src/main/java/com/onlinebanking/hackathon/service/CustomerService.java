@@ -3,6 +3,7 @@ package com.onlinebanking.hackathon.service;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,9 @@ import java.util.Optional;
 public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Optional<Customer> findByUsername(String username)
     {
@@ -30,6 +34,7 @@ public class CustomerService {
         if (usernameExists(customer.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         return customerRepository.save(customer);
     }
 

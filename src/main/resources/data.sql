@@ -1,11 +1,17 @@
 
 INSERT INTO Customer (username, firstname, lastname, password, email, phone)
-VALUES ('NeelamPrasad', 'Neelam', 'Prasad', 'password123','neelam.prasad@gmail.com',637383952),
-               ('NanditaSinha', 'Nandita', 'Sinha', 'Ganesh','nandita.sinha@gmail.com',46568942),
-               ('AdityaSinha', 'Aditya', 'Sinha', 'letmein','aditya.sinha@gmail.com',32536364),
-               ('NareshPrasad', 'Naresh', 'Prasad', 'pass123','naresh.prasad@gmail.com',6767676767),
-               ('Nivi123', 'Nivedita', 'Kumar', 'Welcome234','Nivedita.kumar@gmail.com',8901234561),
-               ('Mayank', 'Mayank', 'Kumar', 'mypassword','Mayank.Kumar@gmail.com',3253636478);
+VALUES ('NeelamPrasad', 'Neelam', 'Prasad', '$2a$10$daP6ZD2vpemeRopJtf9msO/2npdETJ6MV.8lJT6lM9rfGy9W0E5mq','neelam.prasad@gmail.com',637383952),
+              --Password@123
+               ('NanditaSinha', 'Nandita', 'Sinha', '$2a$10$Dp38jMsUr19Rz/gy9eYSaej19klBNp8obdUQ.KaxS/Ln4GEB8Vk2G','nandita.sinha@gmail.com',46568942),
+              --Ganesh@123
+               ('AdityaSinha', 'Aditya', 'Sinha', '$2a$10$poQhuKVlElsSGrQcpnnvSeQXkKpEP45/JKbq/43pqIxV8DrbnE5sG','aditya.sinha@gmail.com',32536364),
+               --Letmein@1
+               ('NareshPrasad', 'Naresh', 'Prasad', '$2a$10$zIwi81SRMWIga/Wq9BNKQeO.jA5xdfrboT7zGbGUXBHdpw650RrDm','naresh.prasad@gmail.com',6767676767),
+               --Pass123@
+               ('Nivi123', 'Nivedita', 'Kumar', '$2a$10$ayxU6XZeIptj.Iu2yVv/4ePjup4yt0zZ726Th3cvTxgblArvai/Ji','Nivedita.kumar@gmail.com',8901234561),
+               --Welcome@234
+               ('Mayank', 'Mayank', 'Kumar', '$2a$10$LZjThsxCQ71G2ddz1d24cuG2SCAsizwlD9saQEesVp5ZKOIt4s4cW','Mayank.Kumar@gmail.com',3253636478);
+               --Mypassword@1
 
 
 INSERT INTO Account (id, customer_id, account_Number, balance)
