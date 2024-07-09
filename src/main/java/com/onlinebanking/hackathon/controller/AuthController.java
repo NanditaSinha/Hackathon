@@ -27,7 +27,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/loginuser")
-    public ResponseEntity<String> loginuser(@RequestBody LoginRequest request, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<String> loginuser(@RequestBody LoginRequest request) {
         Optional<Customer> customerOpt = customerService.findByUsername(request.getUsername());
 
 
