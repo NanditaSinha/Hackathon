@@ -1,5 +1,7 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.AccountDTO;
+import com.onlinebanking.hackathon.dto.CustomerDTO;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
@@ -27,7 +29,7 @@ public class AccountController {
     private TransactionService transactionService;
 
     @GetMapping("/findAccountByCustomerId/{id}")
-    public List<Account> findAccountByCustomerId(@PathVariable long id) {
+    public List<AccountDTO> findAccountByCustomerId(@PathVariable long id) {
         Optional<Customer> customerOpt = customerService.findById(id);
 
         if (!customerOpt.isPresent()) {
@@ -35,12 +37,13 @@ public class AccountController {
         }
 
         Customer customer = customerOpt.get();
-        List<Account> accounts = accountService.findByCustomer(customer);
-        return accounts;
+       // List<Account> accounts = accountService.findByCustomer(customer);
+        List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
+        return accountDtos;
     }
 
     @GetMapping("/findAccountByUsername/{username}")
-    public List<Account> findAccountByCustomerId(@PathVariable String username) {
+    public List<AccountDTO> findAccountByCustomerId(@PathVariable String username) {
         Optional<Customer> customerOpt = customerService.findByUsername(username);
 
         if (!customerOpt.isPresent()) {
@@ -48,17 +51,18 @@ public class AccountController {
         }
 
         Customer customer = customerOpt.get();
-        List<Account> accounts = accountService.findByCustomer(customer);
-
-        return accounts;
+       // List<Account> accounts = accountService.findByCustomer(customer);
+        List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
+        return accountDtos;
     }
 
     @GetMapping("/accountdetail/{accountNumber}")
-    public Account getAccountByAccountNumber(@PathVariable Long accountNumber) {
+    public AccountDTO getAccountByAccountNumber(@PathVariable Long accountNumber) {
         Account account = accountService.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        return account;
+        //return account;
+        return accountService.getAccountDTO(account);
     }
 
     @PostMapping("/createaccountBycustomerid/{customerId}")
@@ -77,7 +81,7 @@ public class AccountController {
     }
 
     @GetMapping("/findAccountsByFromAccountNumber/{fromAccountNumber}")
-    public List<Account> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
+    public List<AccountDTO> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
         Optional<Account> accountOpt = accountService.findByAccountNumber(fromAccountNumber);
 
         if (!accountOpt.isPresent()) {
@@ -86,9 +90,10 @@ public class AccountController {
 
         Account account = accountOpt.get();
         Customer customer = account.getCustomer();
-        List<Account> accounts = accountService.findByCustomer(customer);
+       // List<Account> accounts = accountService.findByCustomer(customer);
+        List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
 
-        return accounts;
+        return accountDtos;
     }
 
 }

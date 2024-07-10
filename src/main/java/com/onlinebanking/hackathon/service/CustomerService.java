@@ -1,5 +1,7 @@
 package com.onlinebanking.hackathon.service;
 
+import com.onlinebanking.hackathon.dto.CustomerDTO;
+import com.onlinebanking.hackathon.dto.CustomerMapper;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +44,13 @@ public class CustomerService {
         return customerRepository.findByUsername(username).isPresent();
     }
 
+
+    public CustomerDTO getCustomerDTO(Customer customer) {
+        return CustomerMapper.toCustomerDTO(customer);
+    }
+
+    public Customer getCustomer(CustomerDTO customerDTO) {
+        return CustomerMapper.toCustomer(customerDTO);
+    }
 
 }

@@ -71,8 +71,8 @@ public class TransactionService {
         return transactions.stream().limit(10).map(transaction -> {
             TransactionDTO dto = new TransactionDTO();
             dto.setId(transaction.getId());
-            dto.setFromAccount(transaction.getFromAccount());
-            dto.setToAccount(transaction.getToAccount());
+            dto.setFromAccount(transaction.getFromAccount().getAccountNumber());
+            dto.setToAccount(transaction.getToAccount().getAccountNumber());
             dto.setAmount(transaction.getAmount());
             dto.setTransactionDate(transaction.getTransactionDate());
             dto.setComment(transaction.getComment());

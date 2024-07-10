@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 public class TransactionDTO {
 
     private Long id;
-    private Account fromAccount;
-    private Account toAccount;
+    private Long fromAccount;
+    private Long  toAccount;
     private BigDecimal amount;
     private LocalDateTime transactionDate;
     private String comment;
