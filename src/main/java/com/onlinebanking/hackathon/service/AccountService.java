@@ -1,6 +1,6 @@
 package com.onlinebanking.hackathon.service;
 
-import com.onlinebanking.hackathon.dto.AccountCreationRequest;
+import com.onlinebanking.hackathon.dto.*;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.entity.Transaction;
@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -30,8 +31,15 @@ public class AccountService {
     @Autowired
     private CustomerService customerService;
 
-    public List<Account> findByCustomer(Customer customer) {
-        return accountRepository.findByCustomer(customer);
+    @Autowired
+    private AccountMapper accountMapper;
+
+    public List<AccountDTO> findByCustomer(Customer customer) {
+        List<Account> accounts = accountRepository.findByCustomer(customer);
+        return accounts.stream()
+                .map(this::getAccountDTO)
+                .collect(Collectors.toList());
+
     }
 
     public List<Account> findByCustomerId(Long customerId) {
@@ -147,5 +155,8 @@ public class AccountService {
         return accountRepository.save(account);
     }*/
 
+    public AccountDTO getAccountDTO(Account account) {
+        return AccountMapper.convertToDto(account);
+    }
 
 }
