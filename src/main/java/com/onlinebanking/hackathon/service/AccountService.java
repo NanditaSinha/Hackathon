@@ -182,5 +182,13 @@ public class AccountService {
         return CustomerMapper.toCustomerDTO(customer);
     }
 
+    public boolean isAccountBelongToUser(String username, Long accountNumber) {
+        Customer customer = customerRepository.findByUsername(username);
+        if (customer == null) {
+            return false;
+        }
+        Account account = accountRepository.findByAccountNumberAndCustomer(accountNumber, customer);
+        return account != null;
+    }
 
 }

@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,8 +96,21 @@ public class AuthController {
         return customerService.getAllCustomers();
     }
 
-    @GetMapping("/findByUsername/{username}")
+ /*   @GetMapping("/findByUsername/{username}")
     public CustomerDTO findCustomerByUsername(@PathVariable String username) {
+        Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
+        if (!customerOpt.isPresent()) {
+            throw new UserNotFoundException("Customer with username " + username + " not found");
+        }
+
+        Customer customer = customerOpt.get();
+        CustomerDTO customerDTO = customerService.getCustomerDTO(customer);
+        return customerDTO;
+    }*/
+
+    @GetMapping("/findByUsername")
+    public CustomerDTO findCustomerByUsername(Principal principal) {
+        String username = principal.getName();
         Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
         if (!customerOpt.isPresent()) {
             throw new UserNotFoundException("Customer with username " + username + " not found");

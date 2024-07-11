@@ -4,15 +4,18 @@ import com.onlinebanking.hackathon.dto.AccountDTO;
 import com.onlinebanking.hackathon.dto.CustomerDTO;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.CustomerService;
 import com.onlinebanking.hackathon.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,8 +45,9 @@ public class AccountController {
         return accountDtos;
     }
 
-    @GetMapping("/findAccountByUsername/{username}")
-    public List<AccountDTO> findAccountByCustomerId(@PathVariable String username) {
+    @GetMapping("/findAccountByUsername")
+    public List<AccountDTO> findAccountByCustomerId(Principal principal) {
+        String username = principal.getName();
         Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
 
         if (!customerOpt.isPresent()) {
@@ -57,11 +61,16 @@ public class AccountController {
     }
 
     @GetMapping("/accountdetail/{accountNumber}")
-    public AccountDTO getAccountByAccountNumber(@PathVariable Long accountNumber) {
+    public AccountDTO getAccountByAccountNumber(@PathVariable Long accountNumber, Principal principal) {
+
+        String username = principal.getName();
+        if (!accountService.isAccountBelongToUser(username, accountNumber)) {
+            throw new UnauthorizedException("Customer with username " + username + " does not have access to requested account number");
+        }
+
         Account account = accountService.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        //return account;
         return accountService.getAccountDTO(account);
     }
 
