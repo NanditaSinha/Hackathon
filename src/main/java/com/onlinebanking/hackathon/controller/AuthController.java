@@ -1,6 +1,8 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.config.JwtUtil;
 import com.onlinebanking.hackathon.dto.CustomerDTO;
+import com.onlinebanking.hackathon.dto.CustomerLoginResponse;
 import com.onlinebanking.hackathon.dto.LoginRequest;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
@@ -13,6 +15,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +35,21 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    public AuthController(CustomerService customerService, JwtUtil jwtUtil,
+                          AuthenticationManager authenticationManager) {
+        this.customerService = customerService;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+
+    }
+
+
+
+
     @Operation(summary = "Get user by ID",
             description = "Returns a user object based on the provided ID",
             responses = {
@@ -36,10 +58,8 @@ public class AuthController {
                     @ApiResponse(description = "User not found", responseCode = "404")
             })
     @PostMapping("/loginuser")
-    public ResponseEntity<String> loginuser(@RequestBody LoginRequest request) {
-        Optional<Customer> customerOpt = customerService.findByUsername(request.getUsername());
-
-
+    public ResponseEntity<?> loginuser(@RequestBody LoginRequest request) {
+        Optional<Customer> customerOpt = customerService.findOptionalByUsername(request.getUsername());
         if (customerOpt.isPresent()) {
             Customer customer = customerOpt.get();
             if (passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
@@ -51,6 +71,25 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(),
+                        request.getPassword()));
+
+        var loginResponse = new CustomerLoginResponse();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if (authentication.isAuthenticated()) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(request.getUsername());
+            loginResponse.setMessage("Logged In Successfully");
+            loginResponse.setToken(token);
+            loginResponse.setUsername(userDetails.getUsername());
+        }
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+    }
+
     @GetMapping(path = "/findcustomers")
     public List<Customer> getAllCustomers() {
         return customerService.getAllCustomers();
@@ -58,7 +97,7 @@ public class AuthController {
 
     @GetMapping("/findByUsername/{username}")
     public CustomerDTO findCustomerByUsername(@PathVariable String username) {
-        Optional<Customer> customerOpt = customerService.findByUsername(username);
+        Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
         if (!customerOpt.isPresent()) {
             throw new UserNotFoundException("Customer with username " + username + " not found");
         }
@@ -68,12 +107,12 @@ public class AuthController {
         return customerDTO;
     }
 
-    @PostMapping("/addCustomer")
+   /* @PostMapping("/addCustomer")
     public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody Customer customer) {
         Customer createdCustomer = customerService.createCustomer(customer);
         CustomerDTO customerDTO = customerService.getCustomerDTO(createdCustomer);
         return ResponseEntity.ok(customerDTO);
-    }
+    }*/
 
 }
 

@@ -9,6 +9,7 @@ import com.onlinebanking.hackathon.repository.CustomerRepository;
 import com.onlinebanking.hackathon.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,6 +35,9 @@ public class AccountService {
     @Autowired
     private AccountMapper accountMapper;
 
+      @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public List<AccountDTO> findByCustomer(Customer customer) {
         List<Account> accounts = accountRepository.findByCustomer(customer);
         return accounts.stream()
@@ -52,7 +56,7 @@ public class AccountService {
     }
 
     public List<Account> findByCustomerUsername(String username) {
-        Customer customer = customerService.findByUsername(username).orElseThrow(() -> new RuntimeException("Customer not found"));
+        Customer customer = customerService.findOptionalByUsername(username).orElseThrow(() -> new RuntimeException("Customer not found"));
         return accountRepository.findByCustomer(customer);
     }
 
@@ -80,7 +84,7 @@ public class AccountService {
 */
     public Account createAccountUserName(String username, Account accountDetails) {
 
-        Optional<Customer> customerOptional = customerRepository.findByUsername(username);
+        Optional<Customer> customerOptional = customerRepository.findOptionalByUsername(username);
         if (customerOptional.isEmpty()) {
             throw new RuntimeException("Customer not found with this user name: " + username);
         }
@@ -90,7 +94,7 @@ public class AccountService {
     }
 
     public Account createAccountByUsername(String username, AccountCreationRequest request) {
-        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
+        Optional<Customer> customerOpt = customerRepository.findOptionalByUsername(username);
         if (customerOpt.isEmpty()) {
             throw new RuntimeException("Customer not found");
         }
@@ -156,7 +160,27 @@ public class AccountService {
     }*/
 
     public AccountDTO getAccountDTO(Account account) {
+
         return AccountMapper.convertToDto(account);
     }
+
+
+
+    public boolean usernameExists(String username) {
+        return customerRepository.findOptionalByUsername(username).isPresent();
+    }
+
+
+    public Customer createCustomer(Customer customer) {
+        if (usernameExists(customer.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+        return customerRepository.save(customer);
+    }
+    public CustomerDTO getCustomerDTO(Customer customer) {
+        return CustomerMapper.toCustomerDTO(customer);
+    }
+
 
 }

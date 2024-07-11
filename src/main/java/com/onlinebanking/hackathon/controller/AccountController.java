@@ -44,7 +44,7 @@ public class AccountController {
 
     @GetMapping("/findAccountByUsername/{username}")
     public List<AccountDTO> findAccountByCustomerId(@PathVariable String username) {
-        Optional<Customer> customerOpt = customerService.findByUsername(username);
+        Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
 
         if (!customerOpt.isPresent()) {
             throw new UserNotFoundException("Customer with id " + username + " not found");
@@ -94,6 +94,13 @@ public class AccountController {
         List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
 
         return accountDtos;
+    }
+
+    @PostMapping("/addCustomer")
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody Customer customer) {
+        Customer createdCustomer = accountService.createCustomer(customer);
+        CustomerDTO customerDTO = accountService.getCustomerDTO(createdCustomer);
+        return ResponseEntity.ok(customerDTO);
     }
 
 }
