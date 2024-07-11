@@ -8,10 +8,8 @@ import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.CustomerService;
-import com.onlinebanking.hackathon.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,23 +26,6 @@ public class AccountController {
     @Autowired
     private CustomerService customerService;
 
-    @Autowired
-    private TransactionService transactionService;
-
-    @GetMapping("/findAccountByCustomerId/{id}")
-    public List<AccountDTO> findAccountByCustomerId(@PathVariable long id) {
-        Optional<Customer> customerOpt = customerService.findById(id);
-
-        if (!customerOpt.isPresent()) {
-            throw new UserNotFoundException("Customer with id " + id + " not found");
-        }
-
-        Customer customer = customerOpt.get();
-       // List<Account> accounts = accountService.findByCustomer(customer);
-        List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
-        return accountDtos;
-    }
-
     @GetMapping("/findAccountByUsername")
     public List<AccountDTO> findAccountByCustomerId(Principal principal) {
         String username = principal.getName();
@@ -55,7 +36,6 @@ public class AccountController {
         }
 
         Customer customer = customerOpt.get();
-       // List<Account> accounts = accountService.findByCustomer(customer);
         List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
         return accountDtos;
     }
@@ -72,37 +52,6 @@ public class AccountController {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
         return accountService.getAccountDTO(account);
-    }
-
-    @PostMapping("/createaccountBycustomerid/{customerId}")
-    public ResponseEntity<Account> createAccount(@PathVariable Long customerId, @Valid @RequestBody Account account) {
-        Account createdAccount = accountService.createAccount(account, customerId);
-        if (createdAccount == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(createdAccount);
-    }
-
-    @PostMapping("/createaccountByusername/{username}")
-    public ResponseEntity<Account> createAccountByUserName(@PathVariable String username, @Valid @RequestBody Account account) {
-        Account createdAccount = accountService.createAccountUserName(username, account);
-        return ResponseEntity.ok(createdAccount);
-    }
-
-    @GetMapping("/findAccountsByFromAccountNumber/{fromAccountNumber}")
-    public List<AccountDTO> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
-        Optional<Account> accountOpt = accountService.findByAccountNumber(fromAccountNumber);
-
-        if (!accountOpt.isPresent()) {
-            throw new UserNotFoundException("Account with number " + fromAccountNumber + " not found");
-        }
-
-        Account account = accountOpt.get();
-        Customer customer = account.getCustomer();
-       // List<Account> accounts = accountService.findByCustomer(customer);
-        List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
-
-        return accountDtos;
     }
 
     @PostMapping("/addCustomer")

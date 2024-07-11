@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +47,6 @@ public class AuthController {
 
     }
 
-
-
-
     @Operation(summary = "Get user by ID",
             description = "Returns a user object based on the provided ID",
             responses = {
@@ -58,20 +54,6 @@ public class AuthController {
                             content = @Content(schema = @Schema(implementation = Customer.class))),
                     @ApiResponse(description = "User not found", responseCode = "404")
             })
-    @PostMapping("/loginuser")
-    public ResponseEntity<?> loginuser(@RequestBody LoginRequest request) {
-        Optional<Customer> customerOpt = customerService.findOptionalByUsername(request.getUsername());
-        if (customerOpt.isPresent()) {
-            Customer customer = customerOpt.get();
-            if (passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
-                return ResponseEntity.ok("Login successful");
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -96,18 +78,6 @@ public class AuthController {
         return customerService.getAllCustomers();
     }
 
- /*   @GetMapping("/findByUsername/{username}")
-    public CustomerDTO findCustomerByUsername(@PathVariable String username) {
-        Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
-        if (!customerOpt.isPresent()) {
-            throw new UserNotFoundException("Customer with username " + username + " not found");
-        }
-
-        Customer customer = customerOpt.get();
-        CustomerDTO customerDTO = customerService.getCustomerDTO(customer);
-        return customerDTO;
-    }*/
-
     @GetMapping("/findByUsername")
     public CustomerDTO findCustomerByUsername(Principal principal) {
         String username = principal.getName();
@@ -120,13 +90,6 @@ public class AuthController {
         CustomerDTO customerDTO = customerService.getCustomerDTO(customer);
         return customerDTO;
     }
-
-   /* @PostMapping("/addCustomer")
-    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody Customer customer) {
-        Customer createdCustomer = customerService.createCustomer(customer);
-        CustomerDTO customerDTO = customerService.getCustomerDTO(createdCustomer);
-        return ResponseEntity.ok(customerDTO);
-    }*/
 
 }
 

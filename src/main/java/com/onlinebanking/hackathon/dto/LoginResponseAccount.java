@@ -1,3 +1,4 @@
+/*
 package com.onlinebanking.hackathon.dto;
 
 import lombok.Data;
@@ -12,4 +13,4 @@ public class LoginResponseAccount {
         this.message = message;
         this.accountUrl = accountUrl;
     }
-}
+}*/

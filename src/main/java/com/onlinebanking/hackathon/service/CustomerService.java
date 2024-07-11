@@ -19,15 +19,6 @@ import java.util.Optional;
 public class CustomerService implements UserDetailsService {
     @Autowired
     private CustomerRepository customerRepository;
-   // @Lazy
-  /*  @Autowired
-    private PasswordEncoder passwordEncoder;*/
-
-/*   @Autowired
-    public CustomerService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
-        this.customerRepository = customerRepository;
-        this.passwordEncoder = passwordEncoder;
-    }*/
 
     public Optional<Customer> findOptionalByUsername(String username) {
         return customerRepository.findOptionalByUsername(username);
@@ -45,25 +36,8 @@ public class CustomerService implements UserDetailsService {
         return customerRepository.findById(id);
     }
 
-   /* public Customer createCustomer(Customer customer) {
-        if (usernameExists(customer.getUsername())) {
-            throw new RuntimeException("Username already exists");
-        }
-        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
-        return customerRepository.save(customer);
-    }*/
-
-    public boolean usernameExists(String username) {
-        return customerRepository.findOptionalByUsername(username).isPresent();
-    }
-
-
     public CustomerDTO getCustomerDTO(Customer customer) {
         return CustomerMapper.toCustomerDTO(customer);
-    }
-
-    public Customer getCustomer(CustomerDTO customerDTO) {
-        return CustomerMapper.toCustomer(customerDTO);
     }
 
     @Override

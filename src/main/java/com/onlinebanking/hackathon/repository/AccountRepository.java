@@ -10,7 +10,6 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findByCustomer(Customer customer);
     Optional<Account> findByAccountNumber(Long accountNumber);
-    Optional<Account> findAccountByCustomer_Username(String username);
     Account findByAccountNumberAndCustomer(Long accountNumber, Customer customer);
 
 }
