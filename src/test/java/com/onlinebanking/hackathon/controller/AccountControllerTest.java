@@ -84,7 +84,7 @@ public class AccountControllerTest {
         AccountDTO accountDTO = new AccountDTO();
 
         when(principal.getName()).thenReturn(username);
-        when(accountService.isAccountBelongToUser(username, accountNumber)).thenReturn(true);
+        when(accountService.isAccountBelongToCustomer(username, accountNumber)).thenReturn(true);
         when(accountService.findByAccountNumber(accountNumber)).thenReturn(Optional.of(account));
         when(accountService.getAccountDTO(account)).thenReturn(accountDTO);
 
@@ -92,7 +92,7 @@ public class AccountControllerTest {
 
         assertNotNull(result);
         assertEquals(accountDTO, result);
-        verify(accountService).isAccountBelongToUser(username, accountNumber);
+        verify(accountService).isAccountBelongToCustomer(username, accountNumber);
         verify(accountService).findByAccountNumber(accountNumber);
         verify(accountService).getAccountDTO(account);
     }
@@ -103,10 +103,10 @@ public class AccountControllerTest {
         Long accountNumber = 10007L;
 
         when(principal.getName()).thenReturn(username);
-        when(accountService.isAccountBelongToUser(username, accountNumber)).thenReturn(false);
+        when(accountService.isAccountBelongToCustomer(username, accountNumber)).thenReturn(false);
 
         assertThrows(UnauthorizedException.class, () -> accountController.getAccountByAccountNumber(accountNumber, principal));
-        verify(accountService).isAccountBelongToUser(username, accountNumber);
+        verify(accountService).isAccountBelongToCustomer(username, accountNumber);
         verify(accountService, never()).findByAccountNumber(accountNumber);
         verify(accountService, never()).getAccountDTO(any(Account.class));
     }

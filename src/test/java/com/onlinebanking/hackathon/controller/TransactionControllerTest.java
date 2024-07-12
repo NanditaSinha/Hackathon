@@ -52,15 +52,15 @@ public class TransactionControllerTest {
         request.setComment("Test Transfer");
 
         when(principal.getName()).thenReturn(username);
-        when(accountService.isAccountBelongToUser(username, request.getFromAccountNumber())).thenReturn(true);
+        when(accountService.isAccountBelongToCustomer(username, request.getFromAccountNumber())).thenReturn(true);
 
         ResponseEntity<String> response = transactionController.transferFunds(principal, request);
 
         assertNotNull(response);
         assertEquals(ResponseEntity.ok().body("Transfer Successful"), response);
 
-        verify(accountService, times(1)).isAccountBelongToUser(username, request.getFromAccountNumber());
-        verify(accountService, times(1)).transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
+        verify(accountService).isAccountBelongToCustomer(username, request.getFromAccountNumber());
+        verify(accountService).transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
     }
 
     @Test
@@ -73,13 +73,13 @@ public class TransactionControllerTest {
         request.setComment("Test Transfer");
 
         when(principal.getName()).thenReturn(username);
-        when(accountService.isAccountBelongToUser(username, request.getFromAccountNumber())).thenReturn(false);
+        when(accountService.isAccountBelongToCustomer(username, request.getFromAccountNumber())).thenReturn(false);
 
         assertThrows(UnauthorizedException.class, () -> {
             transactionController.transferFunds(principal, request);
         });
 
-        verify(accountService, times(1)).isAccountBelongToUser(username, request.getFromAccountNumber());
+        verify(accountService).isAccountBelongToCustomer(username, request.getFromAccountNumber());
         verify(accountService, never()).transferFundsfromAccount(123456789L, 987654321L, BigDecimal.valueOf(100.00), "Test by account number");
     }
 
@@ -91,7 +91,7 @@ public class TransactionControllerTest {
         transactionDTOList.add(new TransactionDTO());
 
         when(principal.getName()).thenReturn(username);
-        when(accountService.isAccountBelongToUser(username, accountNumber)).thenReturn(true);
+        when(accountService.isAccountBelongToCustomer(username, accountNumber)).thenReturn(true);
         when(transactionService.getLast10Transactions(accountNumber)).thenReturn(transactionDTOList);
 
         ResponseEntity<List<TransactionDTO>> response = transactionController.getLast10TransactionsbyAccountnumber(principal, accountNumber);
@@ -99,8 +99,8 @@ public class TransactionControllerTest {
         assertNotNull(response);
         assertEquals(ResponseEntity.ok(transactionDTOList), response);
 
-        verify(accountService, times(1)).isAccountBelongToUser(username, accountNumber);
-        verify(transactionService, times(1)).getLast10Transactions(accountNumber);
+        verify(accountService).isAccountBelongToCustomer(username, accountNumber);
+        verify(transactionService).getLast10Transactions(accountNumber);
     }
 
     @Test
@@ -109,13 +109,13 @@ public class TransactionControllerTest {
         Long accountNumber = 100007L;
 
         when(principal.getName()).thenReturn(username);
-        when(accountService.isAccountBelongToUser(username, accountNumber)).thenReturn(false);
+        when(accountService.isAccountBelongToCustomer(username, accountNumber)).thenReturn(false);
 
         assertThrows(UnauthorizedException.class, () -> {
             transactionController.getLast10TransactionsbyAccountnumber(principal, accountNumber);
         });
 
-        verify(accountService, times(1)).isAccountBelongToUser(username, accountNumber);
-        verify(transactionService, never()).getLast10Transactions(anyLong());
+        verify(accountService).isAccountBelongToCustomer(username, accountNumber);
+        verify(transactionService, never()).getLast10Transactions(100007L);
     }
 }

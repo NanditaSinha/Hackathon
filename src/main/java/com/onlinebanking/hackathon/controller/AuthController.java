@@ -5,12 +5,15 @@ import com.onlinebanking.hackathon.dto.CustomerDTO;
 import com.onlinebanking.hackathon.dto.CustomerLoginResponse;
 import com.onlinebanking.hackathon.dto.LoginRequest;
 import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -31,10 +35,6 @@ import java.util.Optional;
 public class AuthController {
     @Autowired
     private CustomerService customerService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
@@ -47,15 +47,12 @@ public class AuthController {
 
     }
 
-    @Operation(summary = "Get user by ID",
-            description = "Returns a user object based on the provided ID",
-            responses = {
-                    @ApiResponse(description = "Successful Operation", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = Customer.class))),
-                    @ApiResponse(description = "User not found", responseCode = "404")
-            })
+    @Operation(summary = "Create Authentication Token with login credentials")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Customer Logged In")
+    })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(),
                         request.getPassword()));
@@ -78,8 +75,15 @@ public class AuthController {
         return customerService.getAllCustomers();
     }
 
+    @Operation(summary = "Fetch Customer details based on Authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetch Customer details")
+    })
     @GetMapping("/findByUsername")
     public CustomerDTO findCustomerByUsername(Principal principal) {
+        if(Objects.isNull(principal)) {
+            throw new UnauthorizedException("Un-Authorized access");
+        }
         String username = principal.getName();
         Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
         if (!customerOpt.isPresent()) {

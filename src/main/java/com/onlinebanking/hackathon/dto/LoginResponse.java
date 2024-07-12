@@ -1,3 +1,4 @@
+/*
 package com.onlinebanking.hackathon.dto;
 
 
@@ -12,4 +13,5 @@ public class LoginResponse {
     private String accountUrl;
 
 }
+*/
 

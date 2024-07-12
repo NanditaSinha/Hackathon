@@ -1,3 +1,4 @@
+/*
 package com.onlinebanking.hackathon.dto;
 
 import lombok.Data;
@@ -10,4 +11,4 @@ public class TransferRequest {
     private Long toAccountId;
     private BigDecimal amount;
     private String comment;
-}
+}*/

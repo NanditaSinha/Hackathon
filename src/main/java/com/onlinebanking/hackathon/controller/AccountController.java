@@ -8,6 +8,9 @@ import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.CustomerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +29,11 @@ public class AccountController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("/findAccountByUsername")
+    @Operation(summary = "Fetch Accounts details based on Authenticated Customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetch all the accounts for the customer")
+    })
+    @GetMapping("/findAccountsByUsername")
     public List<AccountDTO> findAccountByCustomerId(Principal principal) {
         String username = principal.getName();
         Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
@@ -40,11 +47,15 @@ public class AccountController {
         return accountDtos;
     }
 
+    @Operation(summary = "Fetch Account detail for a specific account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetch the account detail for the Account Number")
+    })
     @GetMapping("/accountdetail/{accountNumber}")
     public AccountDTO getAccountByAccountNumber(@PathVariable Long accountNumber, Principal principal) {
 
         String username = principal.getName();
-        if (!accountService.isAccountBelongToUser(username, accountNumber)) {
+        if (!accountService.isAccountBelongToCustomer(username, accountNumber)) {
             throw new UnauthorizedException("Customer with username " + username + " does not have access to requested account number");
         }
 
@@ -54,6 +65,11 @@ public class AccountController {
         return accountService.getAccountDTO(account);
     }
 
+
+    @Operation(summary = "Add new customer with encrypted password ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New customer added")
+    })
     @PostMapping("/addCustomer")
     public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody Customer customer) {
         Customer createdCustomer = accountService.createCustomer(customer);
