@@ -57,7 +57,7 @@ public class TransactionControllerTest {
         ResponseEntity<String> response = transactionController.transferFunds(principal, request);
 
         assertNotNull(response);
-        assertEquals(ResponseEntity.ok().body("Transfer Successful"), response);
+        assertEquals(ResponseEntity.ok().body(("Transfer from Account number " + request.getFromAccountNumber() + " to Account number: " + request.getToAccountNumber() + " Successful"  )), response);
 
         verify(accountService).isAccountBelongToCustomer(username, request.getFromAccountNumber());
         verify(accountService).transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
