@@ -63,9 +63,19 @@ public class AuthController {
         if (authentication.isAuthenticated()) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String token = jwtUtil.generateToken(request.getUsername());
+
+            Optional<Customer> customerOpt = customerService.findOptionalByUsername(userDetails.getUsername());
+            if (!customerOpt.isPresent()) {
+                throw new UserNotFoundException("Customer with username " + userDetails.getUsername() + " not found");
+            }
+            Customer customer = customerOpt.get();
+            CustomerDTO customerDTO = customerService.getCustomerDTO(customer);
+
+
             loginResponse.setMessage("Logged In Successfully");
             loginResponse.setToken(token);
             loginResponse.setUsername(userDetails.getUsername());
+            loginResponse.setCustomerDetails(customerDTO);
         }
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }

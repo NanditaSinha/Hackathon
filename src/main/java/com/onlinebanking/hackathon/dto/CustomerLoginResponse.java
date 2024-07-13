@@ -12,4 +12,5 @@ public class CustomerLoginResponse {
     private String message;
     private String username;
     private String token;
+    private CustomerDTO customerDetails;
 }

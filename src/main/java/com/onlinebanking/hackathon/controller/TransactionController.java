@@ -1,7 +1,10 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.AccountDTO;
 import com.onlinebanking.hackathon.dto.TransactionDTO;
 import com.onlinebanking.hackathon.dto.TransferRequestByAccountNumber;
+import com.onlinebanking.hackathon.dto.TransferResponse;
+import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.TransactionService;
@@ -31,15 +34,26 @@ public class TransactionController {
             @ApiResponse(responseCode = "200", description = "Transfer funds from one account to other account")
     })
     @PostMapping("/transferfromAccount")
-    public ResponseEntity<String> transferFunds(Principal principal, @Valid  @RequestBody TransferRequestByAccountNumber request) {
+    public ResponseEntity<TransferResponse> transferFunds(Principal principal, @Valid  @RequestBody TransferRequestByAccountNumber request) {
 
         String username = principal.getName();
         if (!accountService.isAccountBelongToCustomer(username, request.getFromAccountNumber())) {
             throw new UnauthorizedException("Customer with username " + username + " is not authorized for transfer from Account - " + request.getFromAccountNumber());
         }
 
-        accountService.transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
-        return ResponseEntity.ok().body("Transfer from Account number " + request.getFromAccountNumber() + " to Account number: " + request.getToAccountNumber() + " Successful"  );
+        accountService.transferFundsfromAccount(request.getFromAccountNumber(),
+                request.getToAccountNumber(), request.getAmount(), request.getComment());
+
+        Account updatedAccount = accountService.findByAccountNumber(request.getFromAccountNumber())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        AccountDTO updatedAccountDTO = accountService.getAccountDTO(updatedAccount);
+
+        TransferResponse transferResponse = new TransferResponse();
+        transferResponse.setMessage("Transfer from Account number " + request.getFromAccountNumber() + " to Account number: " + request.getToAccountNumber() + " Successful");
+        transferResponse.setAccountDetails(updatedAccountDTO);
+
+        return ResponseEntity.ok().body(transferResponse);
     }
 
     @Operation(summary = "Fetch last 10 transaction for the account number ")
