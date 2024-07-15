@@ -4,12 +4,16 @@ import jakarta.persistence.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
 public class Transaction {
@@ -31,16 +35,5 @@ public class Transaction {
 
     private String comment;
 
-    public Transaction() {
-    }
-
-    public Transaction(Long id, Account fromAccount, Account toAccount, BigDecimal amount, LocalDateTime  transactionDate, String comment) {
-        this.id = id;
-        this.fromAccount = fromAccount;
-        this.toAccount = toAccount;
-        this.amount = amount;
-        this.transactionDate = transactionDate;
-        this.comment = comment;
-    }
 
 }
