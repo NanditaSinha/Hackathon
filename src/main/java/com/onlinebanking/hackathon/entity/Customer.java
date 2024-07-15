@@ -26,6 +26,7 @@ public class Customer {
                       "one lowercase letter, and one special character")
     private String password;
 
+
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is mandatory")
     @Column(nullable = false)

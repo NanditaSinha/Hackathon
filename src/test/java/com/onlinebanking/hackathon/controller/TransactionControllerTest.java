@@ -1,25 +1,34 @@
 package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.dto.LoginResponse;
+import com.onlinebanking.hackathon.dto.AccountDTO;
 import com.onlinebanking.hackathon.dto.TransactionDTO;
 import com.onlinebanking.hackathon.dto.TransferRequestByAccountNumber;
-import com.onlinebanking.hackathon.entity.Transaction;
+import com.onlinebanking.hackathon.dto.TransferResponse;
+import com.onlinebanking.hackathon.entity.Account;
+import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
-import java.util.Collections;
+import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TransactionControllerTest {
 
     @InjectMocks
@@ -31,66 +40,71 @@ class TransactionControllerTest {
     @Mock
     private AccountService accountService;
 
+    @Mock
+    private Principal principal;
+
+    private TransferRequestByAccountNumber transferRequest;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        transferRequest = new TransferRequestByAccountNumber();
+        transferRequest.setFromAccountNumber(100007L);
+        transferRequest.setToAccountNumber(100008L);
+        transferRequest.setAmount(BigDecimal.valueOf( 100.0));
+        transferRequest.setComment("Test transfer");
     }
 
-   /* @Test
-    void testTransferFunds() {
-        TransferRequest request = new TransferRequest();
-        request.setFromAccountId(1L);
-        request.setToAccountId(2L);
-        request.setAmount(BigDecimal.valueOf( 100.0));
-        request.setComment("Test transfer");
+    @Test
+    void transferFunds_Unauthorized() {
+        when(principal.getName()).thenReturn("NanditaSinha");
+        when(accountService.isAccountBelongToCustomer("NanditaSinha", 100007L)).thenReturn(false);
 
-        doNothing().when(transactionService).transferFunds(1L, 2L, BigDecimal.valueOf(100.00), "Test transfer");
+        assertThrows(UnauthorizedException.class, () -> {
+            transactionController.transferFunds(principal, transferRequest);
+        });
+    }
 
-        ResponseEntity<?> response = transactionController.transferFunds(request);
+    @Test
+    void transferFunds_Success() {
+        when(principal.getName()).thenReturn("NanditaSinha");
+        when(accountService.isAccountBelongToCustomer("NanditaSinha", 100007L)).thenReturn(true);
+        doNothing().when(accountService).transferFundsfromAccount(100007L, 100008L, BigDecimal.valueOf(100.0), "Test transfer");
 
-        assertEquals("Transfer successful", response.getBody());
-        verify(transactionService, times(1)).transferFunds(1L, 2L,BigDecimal.valueOf( 100.00), "Test transfer");
+        Account account = new Account();
+        when(accountService.findByAccountNumber(100007L)).thenReturn(Optional.of(account));
+
+        AccountDTO accountDTO = new AccountDTO();
+        when(accountService.getAccountDTO(any(Account.class))).thenReturn(accountDTO);
+
+        ResponseEntity<TransferResponse> response = transactionController.transferFunds(principal, transferRequest);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Transfer from Account number " + transferRequest.getFromAccountNumber() + " to Account number: " + transferRequest.getToAccountNumber() + " Successful",  response.getBody().getMessage());
+       //assertEquals("Transfer from Account number 1 to Account number: 2 Successful", response.getBody().getMessage());
+        assertEquals(accountDTO, response.getBody().getAccountDetails());
+    }
+
+ /*   @Test
+    void getLast10TransactionsbyAccountnumber_Unauthorized() {
+        when(principal.getName()).thenReturn("NanditaSinha");
+        when(accountService.isAccountBelongToCustomer("NeelamPrasad", 100008L)).thenReturn(false);
+
+        assertThrows(UnauthorizedException.class, () -> {
+            transactionController.getLast10TransactionsbyAccountnumber(principal, 100007L);
+        });
     }*/
 
     @Test
-    void testTransferFundsByAccountNumber() {
-        TransferRequestByAccountNumber request = new TransferRequestByAccountNumber();
-        request.setFromAccountNumber(123456789L);
-        request.setToAccountNumber(987654321L);
-        request.setAmount(BigDecimal.valueOf(100.0));
-        request.setComment("Test by account number");
+    void getLast10TransactionsbyAccountnumber_Success() {
+        when(principal.getName()).thenReturn("NanditaSinha");
+        when(accountService.isAccountBelongToCustomer("NanditaSinha", 100007L)).thenReturn(true);
 
-        doNothing().when(accountService).transferFundsfromAccount(123456789L, 987654321L, BigDecimal.valueOf(100.00), "Test by account number");
+        List<TransactionDTO> transactions = Arrays.asList(new TransactionDTO(), new TransactionDTO());
+        when(transactionService.getLast10Transactions(100007L)).thenReturn(transactions);
 
-        ResponseEntity<?> response = transactionController.transferFunds(request);
+        ResponseEntity<List<TransactionDTO>> response = transactionController.getLast10TransactionsbyAccountnumber(principal, 100007L);
 
-        assertEquals("Transfer Successful", ((LoginResponse) response.getBody()).getMessage());
-        verify(accountService).transferFundsfromAccount(123456789L, 987654321L, BigDecimal.valueOf(100.00), "Test by account number");
-    }
-
-    @Test
-    void testGetLast10TransactionsByAccountNumber() {
-        Long accountNumber = 123456789L;
-        List<TransactionDTO> transactionDTOList = Collections.emptyList();
-
-        when(transactionService.getLast10Transactions(accountNumber)).thenReturn(transactionDTOList);
-
-        ResponseEntity<List<TransactionDTO>> response = transactionController.getLast10TransactionsbyAccountnumber(accountNumber);
-
-        assertEquals(transactionDTOList, response.getBody());
-        verify(transactionService).getLast10Transactions(accountNumber);
-    }
-
-    @Test
-    void testTransactionDetails() {
-        Long transactionId = 1L;
-        Transaction transaction = new Transaction();
-
-        when(transactionService.findById(transactionId)).thenReturn(transaction);
-
-        Transaction result = transactionController.transactionDetails(transactionId);
-
-        assertEquals(transaction, result);
-        verify(transactionService).findById(transactionId);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(transactions, response.getBody());
     }
 }

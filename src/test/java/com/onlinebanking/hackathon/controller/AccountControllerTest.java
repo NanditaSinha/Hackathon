@@ -1,29 +1,36 @@
 package com.onlinebanking.hackathon.controller;
 
+import com.onlinebanking.hackathon.dto.AccountDTO;
+import com.onlinebanking.hackathon.dto.CustomerDTO;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.exception.UnauthorizedException;
+import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.CustomerService;
-import com.onlinebanking.hackathon.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
+import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class AccountControllerTest {
+@ExtendWith(MockitoExtension.class)
+public class AccountControllerTest {
 
-    private MockMvc mockMvc;
+    @InjectMocks
+    private AccountController accountController;
 
     @Mock
     private AccountService accountService;
@@ -32,165 +39,97 @@ class AccountControllerTest {
     private CustomerService customerService;
 
     @Mock
-    private TransactionService transactionService;
-
-    @InjectMocks
-    private AccountController accountController;
+    private Principal principal;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(accountController).build();
     }
 
     @Test
-    void testFindAccountByCustomerIdSuccess() throws Exception {
-        long customerId = 1L;
+    public void testFindAccountByCustomerId_Success() {
+        String username = "NanditaSinha";
         Customer customer = new Customer();
-        customer.setId(customerId);
-        Account account = new Account();
-        account.setCustomer(customer);
-        List<Account> accounts = List.of(account);
+        List<AccountDTO> accountDTOs = Arrays.asList(new AccountDTO());
 
-        when(customerService.findById(customerId)).thenReturn(Optional.of(customer));
-        when(accountService.findByCustomer(customer)).thenReturn(accounts);
+        when(principal.getName()).thenReturn(username);
+        when(customerService.findOptionalByUsername(username)).thenReturn(Optional.of(customer));
+        when(accountService.findByCustomer(customer)).thenReturn(accountDTOs);
 
-        mockMvc.perform(get("/accounts/findAccountByCustomerId/{id}", customerId))
-                .andExpect(status().isOk());
+        List<AccountDTO> result = accountController.findAccountByCustomerId(principal);
 
-        verify(customerService).findById(customerId);
+        assertNotNull(result);
+        assertEquals(accountDTOs.size(), result.size());
+        verify(customerService).findOptionalByUsername(username);
         verify(accountService).findByCustomer(customer);
     }
 
     @Test
-    void testFindAccountByCustomerIdNotFound() throws Exception {
-        long customerId = 1L;
-
-        when(customerService.findById(customerId)).thenReturn(Optional.empty());
-
-        mockMvc.perform(get("/accounts/findAccountByCustomerId/{id}", customerId))
-                .andExpect(status().isNotFound());
-
-        verify(customerService).findById(customerId);
-    }
-
-    @Test
-    void testFindAccountByUsernameSuccess() throws Exception {
-        String username = "NanditaSinha";
-        Customer customer = new Customer();
-        customer.setUsername(username);
-        Account account = new Account();
-        account.setCustomer(customer);
-        List<Account> accounts = List.of(account);
-
-        when(customerService.findByUsername(username)).thenReturn(Optional.of(customer));
-        when(accountService.findByCustomer(customer)).thenReturn(accounts);
-
-        mockMvc.perform(get("/accounts/findAccountByUsername/{username}", username))
-                .andExpect(status().isOk());
-
-        verify(customerService).findByUsername(username);
-        verify(accountService).findByCustomer(customer);
-    }
-
-    @Test
-    void testFindAccountByUsernameNotFound() throws Exception {
+    public void testFindAccountByCustomerId_UserNotFound() {
         String username = "NanditaSinha";
 
-        when(customerService.findByUsername(username)).thenReturn(Optional.empty());
+        when(principal.getName()).thenReturn(username);
+        when(customerService.findOptionalByUsername(username)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/accounts/findAccountByUsername/{username}", username))
-                .andExpect(status().isNotFound());
-
-        verify(customerService).findByUsername(username);
+        assertThrows(UserNotFoundException.class, () -> accountController.findAccountByCustomerId(principal));
+        verify(customerService).findOptionalByUsername(username);
+        verify(accountService, never()).findByCustomer(any(Customer.class));
     }
 
     @Test
-    void testGetAccountByAccountNumberSuccess() throws Exception {
-        long accountNumber = 12345L;
+    public void testGetAccountByAccountNumber_Success() {
+        String username = "NanditaSinha";
+        Long accountNumber = 123L;
         Account account = new Account();
-        account.setAccountNumber(accountNumber);
+        AccountDTO accountDTO = new AccountDTO();
 
+        when(principal.getName()).thenReturn(username);
+        when(accountService.isAccountBelongToCustomer(username, accountNumber)).thenReturn(true);
         when(accountService.findByAccountNumber(accountNumber)).thenReturn(Optional.of(account));
+        when(accountService.getAccountDTO(account)).thenReturn(accountDTO);
 
-        mockMvc.perform(get("/accounts/accountdetail/{accountNumber}", accountNumber))
-                .andExpect(status().isOk());
+        AccountDTO result = accountController.getAccountByAccountNumber(accountNumber, principal);
 
+        assertNotNull(result);
+        assertEquals(accountDTO, result);
+        verify(accountService).isAccountBelongToCustomer(username, accountNumber);
         verify(accountService).findByAccountNumber(accountNumber);
+        verify(accountService).getAccountDTO(account);
     }
 
     @Test
-    void testCreateAccountByCustomerIdSuccess() throws Exception {
-        long customerId = 1L;
-        Account account = new Account();
-        account.setCustomer(new Customer());
-
-        when(accountService.createAccount(any(Account.class), eq(customerId))).thenReturn(account);
-
-        mockMvc.perform(post("/accounts/createaccountBycustomerid/{customerId}", customerId)
-                        .contentType("application/json")
-                        .content("{\"accountNumber\": 12345}"))
-                .andExpect(status().isOk());
-
-        verify(accountService).createAccount(any(Account.class), eq(customerId));
-    }
-
-  /*  @Test
-    void testCreateAccountByCustomerIdNotFound() throws Exception {
-        long customerId = 1L;
-
-        when(accountService.createAccount(any(Account.class), eq(customerId))).thenReturn(null);
-
-        mockMvc.perform(post("/accounts/createaccountBycustomerid/{customerId}", customerId)
-                        .contentType("application/json")
-                        .content("{\"accountNumber\": 12345}"))
-                .andExpect(status().isNotFound());
-
-        verify(accountService, times(1)).createAccount(any(Account.class), eq(customerId));
-    }*/
-
-    @Test
-    void testCreateAccountByUsernameSuccess() throws Exception {
+    public void testGetAccountByAccountNumber_Unauthorized() {
         String username = "NanditaSinha";
-        Account account = new Account();
+        Long accountNumber = 10007L;
 
-        when(accountService.createAccountUserName(eq(username), any(Account.class))).thenReturn(account);
+        when(principal.getName()).thenReturn(username);
+        when(accountService.isAccountBelongToCustomer(username, accountNumber)).thenReturn(false);
 
-        mockMvc.perform(post("/accounts/createaccountByusername/{username}", username)
-                        .contentType("application/json")
-                        .content("{\"accountNumber\": 12345}"))
-                .andExpect(status().isOk());
-
-        verify(accountService).createAccountUserName(eq(username), any(Account.class));
+        assertThrows(UnauthorizedException.class, () -> accountController.getAccountByAccountNumber(accountNumber, principal));
+        verify(accountService).isAccountBelongToCustomer(username, accountNumber);
+        verify(accountService, never()).findByAccountNumber(accountNumber);
+        verify(accountService, never()).getAccountDTO(any(Account.class));
     }
 
     @Test
-    void testFindAccountsByFromAccountNumberSuccess() throws Exception {
-        long fromAccountNumber = 12345L;
-        Account account = new Account();
+    public void testCreateCustomer_Success() {
         Customer customer = new Customer();
-        account.setCustomer(customer);
-        List<Account> accounts = List.of(account);
+        customer.setUsername("RichaS");
+        customer.setFirstname("Richa");
+        customer.setLastname("Shukla");
+        customer.setEmail("Richa133@gmail.com");
+        customer.setPhone( 433465879);
+        Customer createdCustomer = new Customer();
+        CustomerDTO customerDTO = new CustomerDTO();
 
-        when(accountService.findByAccountNumber(fromAccountNumber)).thenReturn(Optional.of(account));
-        when(accountService.findByCustomer(customer)).thenReturn(accounts);
+        when(accountService.createCustomer(customer)).thenReturn(createdCustomer);
+        when(accountService.getCustomerDTO(createdCustomer)).thenReturn(customerDTO);
 
-        mockMvc.perform(get("/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}", fromAccountNumber))
-                .andExpect(status().isOk());
+        ResponseEntity<CustomerDTO> response = accountController.createCustomer(customer);
 
-        verify(accountService).findByAccountNumber(fromAccountNumber);
-        verify(accountService).findByCustomer(customer);
-    }
-
-    @Test
-    void testFindAccountsByFromAccountNumberNotFound() throws Exception {
-        long fromAccountNumber = 12345L;
-
-        when(accountService.findByAccountNumber(fromAccountNumber)).thenReturn(Optional.empty());
-
-        mockMvc.perform(get("/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}", fromAccountNumber))
-                .andExpect(status().isNotFound());
-
-        verify(accountService).findByAccountNumber(fromAccountNumber);
+        assertNotNull(response);
+        assertEquals(customerDTO, response.getBody());
+        verify(accountService).createCustomer(customer);
+        verify(accountService).getCustomerDTO(createdCustomer);
     }
 }

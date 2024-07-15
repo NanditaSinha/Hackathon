@@ -4,15 +4,19 @@ import com.onlinebanking.hackathon.dto.AccountDTO;
 import com.onlinebanking.hackathon.dto.CustomerDTO;
 import com.onlinebanking.hackathon.entity.Account;
 import com.onlinebanking.hackathon.entity.Customer;
+import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.CustomerService;
-import com.onlinebanking.hackathon.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,75 +29,52 @@ public class AccountController {
     @Autowired
     private CustomerService customerService;
 
-    @Autowired
-    private TransactionService transactionService;
-
-    @GetMapping("/findAccountByCustomerId/{id}")
-    public List<AccountDTO> findAccountByCustomerId(@PathVariable long id) {
-        Optional<Customer> customerOpt = customerService.findById(id);
-
-        if (!customerOpt.isPresent()) {
-            throw new UserNotFoundException("Customer with id " + id + " not found");
-        }
-
-        Customer customer = customerOpt.get();
-       // List<Account> accounts = accountService.findByCustomer(customer);
-        List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
-        return accountDtos;
-    }
-
-    @GetMapping("/findAccountByUsername/{username}")
-    public List<AccountDTO> findAccountByCustomerId(@PathVariable String username) {
-        Optional<Customer> customerOpt = customerService.findByUsername(username);
+    @Operation(summary = "Fetch Accounts details based on Authenticated Customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetch all the accounts for the customer")
+    })
+    @GetMapping("/findAccountsByUsername")
+    public List<AccountDTO> findAccountByCustomerId(Principal principal) {
+        String username = principal.getName();
+        Optional<Customer> customerOpt = customerService.findOptionalByUsername(username);
 
         if (!customerOpt.isPresent()) {
             throw new UserNotFoundException("Customer with id " + username + " not found");
         }
 
         Customer customer = customerOpt.get();
-       // List<Account> accounts = accountService.findByCustomer(customer);
         List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
         return accountDtos;
     }
 
+    @Operation(summary = "Fetch Account detail for a specific account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetch the account detail for the Account Number")
+    })
     @GetMapping("/accountdetail/{accountNumber}")
-    public AccountDTO getAccountByAccountNumber(@PathVariable Long accountNumber) {
+    public AccountDTO getAccountByAccountNumber(@PathVariable Long accountNumber, Principal principal) {
+
+        String username = principal.getName();
+        if (!accountService.isAccountBelongToCustomer(username, accountNumber)) {
+            throw new UnauthorizedException("Customer with username " + username + " does not have access to requested account number");
+        }
+
         Account account = accountService.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        //return account;
         return accountService.getAccountDTO(account);
     }
 
-    @PostMapping("/createaccountBycustomerid/{customerId}")
-    public ResponseEntity<Account> createAccount(@PathVariable Long customerId, @Valid @RequestBody Account account) {
-        Account createdAccount = accountService.createAccount(account, customerId);
-        if (createdAccount == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(createdAccount);
-    }
 
-    @PostMapping("/createaccountByusername/{username}")
-    public ResponseEntity<Account> createAccountByUserName(@PathVariable String username, @Valid @RequestBody Account account) {
-        Account createdAccount = accountService.createAccountUserName(username, account);
-        return ResponseEntity.ok(createdAccount);
-    }
-
-    @GetMapping("/findAccountsByFromAccountNumber/{fromAccountNumber}")
-    public List<AccountDTO> findAccountsByFromAccountNumber(@PathVariable Long fromAccountNumber) {
-        Optional<Account> accountOpt = accountService.findByAccountNumber(fromAccountNumber);
-
-        if (!accountOpt.isPresent()) {
-            throw new UserNotFoundException("Account with number " + fromAccountNumber + " not found");
-        }
-
-        Account account = accountOpt.get();
-        Customer customer = account.getCustomer();
-       // List<Account> accounts = accountService.findByCustomer(customer);
-        List<AccountDTO> accountDtos = accountService.findByCustomer(customer);
-
-        return accountDtos;
+    @Operation(summary = "Add new customer with encrypted password ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New customer added")
+    })
+    @PostMapping("/addCustomer")
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody Customer customer) {
+        Customer createdCustomer = accountService.createCustomer(customer);
+        CustomerDTO customerDTO = accountService.getCustomerDTO(createdCustomer);
+        return ResponseEntity.ok(customerDTO);
     }
 
 }

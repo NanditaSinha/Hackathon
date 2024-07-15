@@ -1,16 +1,22 @@
 package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.dto.LoginResponse;
+import com.onlinebanking.hackathon.dto.AccountDTO;
 import com.onlinebanking.hackathon.dto.TransactionDTO;
-import com.onlinebanking.hackathon.dto.TransferRequest;
 import com.onlinebanking.hackathon.dto.TransferRequestByAccountNumber;
-import com.onlinebanking.hackathon.entity.Transaction;
+import com.onlinebanking.hackathon.dto.TransferResponse;
+import com.onlinebanking.hackathon.entity.Account;
+import com.onlinebanking.hackathon.exception.UnauthorizedException;
 import com.onlinebanking.hackathon.service.AccountService;
 import com.onlinebanking.hackathon.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -22,33 +28,46 @@ public class TransactionController {
     @Autowired
     private AccountService accountService;
 
-    @PostMapping("/transfer")
-    public ResponseEntity<?> transferFunds(@RequestBody TransferRequest request) {
-        transactionService.transferFunds(request.getFromAccountId(), request.getToAccountId(), request.getAmount(), request.getComment());
-        return ResponseEntity.ok().body("Transfer successful");
-    }
 
+    @Operation(summary = "Transfer funds from one account to other account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Transfer funds from one account to other account")
+    })
     @PostMapping("/transferfromAccount")
-    public ResponseEntity<?> transferFunds(@RequestBody TransferRequestByAccountNumber request) {
+    public ResponseEntity<TransferResponse> transferFunds(Principal principal, @Valid  @RequestBody TransferRequestByAccountNumber request) {
 
-        accountService.transferFundsfromAccount(request.getFromAccountNumber(), request.getToAccountNumber(), request.getAmount(), request.getComment());
+        String username = principal.getName();
+        if (!accountService.isAccountBelongToCustomer(username, request.getFromAccountNumber())) {
+            throw new UnauthorizedException("Customer with username " + username + " is not authorized for transfer from Account - " + request.getFromAccountNumber());
+        }
 
-        String accountUrl = "/hackathon/accounts/findAccountsByFromAccountNumber/{fromAccountNumber}" + request.getFromAccountNumber();
-        LoginResponse response = new LoginResponse("Transfer Successful", accountUrl);
+        accountService.transferFundsfromAccount(request.getFromAccountNumber(),
+                request.getToAccountNumber(), request.getAmount(), request.getComment());
 
+        Account updatedAccount = accountService.findByAccountNumber(request.getFromAccountNumber())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        return ResponseEntity.ok().body(response);
+        AccountDTO updatedAccountDTO = accountService.getAccountDTO(updatedAccount);
+
+        TransferResponse transferResponse = new TransferResponse();
+        transferResponse.setMessage("Transfer from Account number " + request.getFromAccountNumber() + " to Account number: " + request.getToAccountNumber() + " Successful");
+        transferResponse.setAccountDetails(updatedAccountDTO);
+
+        return ResponseEntity.ok().body(transferResponse);
     }
 
-
-    @GetMapping("/transactionDetails/{id}")
-    public Transaction transactionDetails(@PathVariable Long id) {
-        return transactionService.findById(id);
-    }
-
-
+    @Operation(summary = "Fetch last 10 transaction for the account number ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetch last 10 transaction for the account number ")
+    })
     @GetMapping("/{accountNumber}/last10")
-    public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(@PathVariable Long accountNumber) {
+    public ResponseEntity<List<TransactionDTO>> getLast10TransactionsbyAccountnumber(Principal principal,@PathVariable Long accountNumber) {
+
+        String username = principal.getName();
+        if (!accountService.isAccountBelongToCustomer(username, accountNumber)) {
+            throw new UnauthorizedException("Customer with username " + username + " does not have access to requested account number");
+        }
+
         List<TransactionDTO> transactions = transactionService.getLast10Transactions(accountNumber);
         return ResponseEntity.ok(transactions);
     }

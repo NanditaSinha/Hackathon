@@ -51,20 +51,9 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-
-
-    public List<Transaction> findLast10TransactionsByAccountNumber(Long accountNumber) {
-        return transactionRepository.findFirst10ByFromAccount_AccountNumberOrderByTransactionDateDesc(accountNumber);
-    }
-
     public Transaction findById(Long id) {
         return transactionRepository.findById(id).orElse(null);
     }
-
-/*    public Account getAccountDetails(Long accountId) {
-        return accountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
-    }*/
 
     public List<TransactionDTO> getLast10Transactions(Long accountNumber) {
         List<Transaction> transactions = transactionRepository.findLast10TransactionsByAccountNumber(accountNumber);

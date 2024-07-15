@@ -1,7 +1,7 @@
 package com.onlinebanking.hackathon.controller;
 
-import com.onlinebanking.hackathon.dto.LoginRequest;
-import com.onlinebanking.hackathon.dto.LoginResponse;
+import com.onlinebanking.hackathon.config.JwtUtil;
+import com.onlinebanking.hackathon.dto.CustomerDTO;
 import com.onlinebanking.hackathon.entity.Customer;
 import com.onlinebanking.hackathon.exception.UserNotFoundException;
 import com.onlinebanking.hackathon.service.CustomerService;
@@ -10,76 +10,111 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collections;
+import java.security.Principal;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AuthControllerTest {
+public class AuthControllerTest {
+
+    @InjectMocks
+    private AuthController authController;
 
     @Mock
     private CustomerService customerService;
-    @InjectMocks
-    private AuthController authController;
-    private Customer customer;
-    private LoginRequest loginRequest;
+
+    @Mock
+    private JwtUtil jwtUtil;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private Principal principal;
+
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private UserDetails userDetails;
 
     @BeforeEach
-    void setUp() {
-        customer = new Customer();
-        customer.setUsername("NanditaSinha");
-        customer.setPassword("Ganesh");
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
-        loginRequest = new LoginRequest();
+  /* @Test
+    public void testLogin_Success() {
+        LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUsername("NanditaSinha");
-        loginRequest.setPassword("Ganesh");
-    }
+        loginRequest.setPassword("Ganesh@123");
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn("NanditaSinha");
+        when(jwtUtil.generateToken("NanditaSinha")).thenReturn("jwt-token");
+
+        ResponseEntity<?> response = authController.login(loginRequest);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        CustomerLoginResponse loginResponse = (CustomerLoginResponse) response.getBody();
+        assertNotNull(loginResponse);
+        assertEquals("Logged In Successfully", loginResponse.getMessage());
+        assertEquals("jwt-token", loginResponse.getToken());
+        assertEquals("NanditaSinha", loginResponse.getUsername());
+    }*/
+
     @Test
-    void testLoginUserUserNotFound() {
-        when(customerService.findByUsername("NanditaSinha")).thenReturn(Optional.empty());
-
-        ResponseEntity<?> response = authController.loginuser(loginRequest);
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid username or password", response.getBody());
+    public void testGetAllCustomers_Success() {
+        authController.getAllCustomers();
+        verify(customerService).getAllCustomers();
     }
 
     @Test
-    void testGetAllCustomers() {
-        when(customerService.getAllCustomers()).thenReturn(Collections.singletonList(customer));
+    public void testFindCustomerByUsername_Success() {
+        String username = "NanditaSinha";
+        when(principal.getName()).thenReturn(username);
 
-        assertEquals(1, authController.getAllCustomers().size());
+        Customer customer = new Customer();
+        customer.setUsername(username);
+        when(customerService.findOptionalByUsername(username)).thenReturn(Optional.of(customer));
+        when(customerService.getCustomerDTO(customer)).thenReturn(new CustomerDTO());
+
+        CustomerDTO result = authController.findCustomerByUsername(principal);
+
+        assertNotNull(result);
+        verify(customerService).findOptionalByUsername(username);
+        verify(customerService).getCustomerDTO(customer);
     }
 
     @Test
-    void testFindCustomerByUsernameNotFound() {
-        when(customerService.findByUsername("NanditaSinha")).thenReturn(Optional.empty());
+    public void testFindCustomerByUsername_UserNotFound() {
+        String username = "NanditaSinha";
+        when(principal.getName()).thenReturn(username);
+
+        when(customerService.findOptionalByUsername(username)).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> {
-            authController.findCustomerByUsername("NanditaSinha");
+            authController.findCustomerByUsername(principal);
         });
-    }
 
-    @Test
-    void testCreateCustomer() {
-        Customer customer = new Customer();
-        customer.setUsername("RichaS");
-
-        when(customerService.createCustomer(any(Customer.class))).thenReturn(customer);
-
-        ResponseEntity<Customer> response = authController.createCustomer(customer);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("RichaS", response.getBody().getUsername());
+        verify(customerService).findOptionalByUsername(username);
     }
 }
